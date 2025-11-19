@@ -1,0 +1,181 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Welcome, {{ partnerName }}!</h1>
+      </div>
+      <div class="header-right">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content">
+      <p class="welcome-subtitle">
+        Complete your profile to start receiving booking requests from
+        customers.
+      </p>
+
+      <!-- Profile Completion Card -->
+      <div class="completion-card">
+        <div class="card-header">
+          <h2 class="card-title">Profile Completion</h2>
+          <p class="card-subtitle">
+            Complete your profile to improve your chances of getting more
+            bookings
+          </p>
+        </div>
+
+        <div class="completion-progress">
+          <div class="progress-info">
+            <span class="progress-label"
+              >{{ profileCompletionPercentage }}% Complete</span
+            >
+            <span class="progress-action">Keep going!</span>
+          </div>
+          <mat-progress-bar
+            mode="determinate"
+            [value]="profileCompletionPercentage"
+          ></mat-progress-bar>
+        </div>
+
+        <div class="completion-sections">
+          @for (section of profileSections; track section.name) {
+          <div class="section-item" [class.completed]="section.completed">
+            <div class="section-icon-container">
+              @if (section.completed) {
+              <mat-icon class="section-status completed-icon"
+                >check_circle</mat-icon
+              >
+              } @else {
+              <mat-icon class="section-icon">{{ section.icon }}</mat-icon>
+              }
+            </div>
+            <div class="section-content">
+              <h3 class="section-title">{{ section.label }}</h3>
+              <p class="section-description">
+                @if (section.name === 'basicProfile') { Add your personal
+                details and contact information } @else if (section.name ===
+                'services') { Add services you offer with pricing details }
+                @else if (section.name === 'portfolio') { Showcase your work
+                with photos of past projects }
+              </p>
+            </div>
+            <div class="section-action">
+              @if (section.completed) {
+              <span class="status-badge done">Done</span>
+              } @else {
+              <button
+                mat-stroked-button
+                class="action-btn"
+                (click)="handleProfileAction(section)"
+              >
+                {{ section.action }}
+              </button>
+              }
+            </div>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Two Column Layout -->
+      <div class="two-column-layout">
+        <!-- Quick Actions -->
+        <div class="action-card">
+          <h2 class="card-title">Quick Actions</h2>
+          <p class="card-subtitle">Common tasks to get you started</p>
+
+          <div class="action-list">
+            @for (action of quickActions; track action.action) {
+            <button
+              class="action-item"
+              (click)="handleQuickAction(action.action)"
+            >
+              <div class="action-content">
+                <mat-icon class="action-icon">{{ action.icon }}</mat-icon>
+                <span class="action-label">{{ action.label }}</span>
+              </div>
+              <mat-icon class="arrow-icon">arrow_forward</mat-icon>
+            </button>
+            }
+          </div>
+        </div>
+
+        <!-- Getting Started Guide -->
+        <div class="guide-card">
+          <h2 class="card-title">Getting Started Guide</h2>
+          <p class="card-subtitle">Tips to maximize your success</p>
+
+          <div class="guide-list">
+            @for (tip of gettingStartedTips; track tip.number) {
+            <div class="guide-item">
+              <div class="tip-number">{{ tip.number }}</div>
+              <p class="tip-text">{{ tip.text }}</p>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Statistics Cards -->
+      <div class="statistics-grid">
+        @for (stat of statistics; track stat.label) {
+        <div class="stat-card">
+          <div class="stat-icon-container">
+            <mat-icon class="stat-icon">{{ stat.icon }}</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">{{ stat.value }}</div>
+            <div class="stat-label">{{ stat.label }}</div>
+          </div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

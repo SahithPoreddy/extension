@@ -1,0 +1,157 @@
+<div class="registration-container">
+  <!-- Header with Logo -->
+  <header class="header">
+    <div class="logo" (click)="navigateBack()">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span>UrbanFix</span>
+    </div>
+  </header>
+
+  <!-- Back Button -->
+  <div class="back-button-container">
+    <button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+
+  <!-- Registration Form Card -->
+  <div class="registration-card">
+    <!-- Logo in Card -->
+    <div class="card-logo">
+      <div class="logo-square">
+        <span>UF</span>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="title">Create Account</h1>
+    <p class="subtitle">Join thousands of happy customers</p>
+
+    <!-- Form -->
+    <form [formGroup]="registrationForm" (ngSubmit)="onSubmit()">
+      <!-- Full Name Field -->
+      <div class="form-field">
+        <label for="fullName">Full Name <span class="required">*</span></label>
+        <input
+          id="fullName"
+          type="text"
+          formControlName="fullName"
+          placeholder="Enter your full name"
+          maxlength="50"
+        />
+        @if (getErrorMessage('fullName')) {
+        <div class="error-message">{{ getErrorMessage("fullName") }}</div>
+        }
+      </div>
+
+      <!-- Email Field -->
+      <div class="form-field">
+        <label for="email">Email Address <span class="required">*</span></label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+        @if (getErrorMessage('email')) {
+        <div class="error-message">{{ getErrorMessage("email") }}</div>
+        }
+      </div>
+
+      <!-- Phone Number Field -->
+      <div class="form-field">
+        <label for="phoneNumber">Phone Number</label>
+        <input
+          id="phoneNumber"
+          type="tel"
+          formControlName="phoneNumber"
+          placeholder="Enter your phone number"
+          maxlength="10"
+        />
+        @if (getErrorMessage('phoneNumber')) {
+        <div class="error-message">{{ getErrorMessage("phoneNumber") }}</div>
+        }
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-field">
+        <label for="password">Password <span class="required">*</span></label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Create a password"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          >
+            <mat-icon>{{
+              showPassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+        </div>
+        @if (getErrorMessage('password')) {
+        <div class="error-message">{{ getErrorMessage("password") }}</div>
+        }
+      </div>
+
+      <!-- Confirm Password Field -->
+      <div class="form-field">
+        <label for="confirmPassword"
+          >Confirm Password <span class="required">*</span></label
+        >
+        <div class="password-field">
+          <input
+            id="confirmPassword"
+            [type]="showConfirmPassword ? 'text' : 'password'"
+            formControlName="confirmPassword"
+            placeholder="Confirm your password"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="toggleConfirmPasswordVisibility()"
+          >
+            <mat-icon>{{
+              showConfirmPassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+        </div>
+        @if (getErrorMessage('confirmPassword')) {
+        <div class="error-message">
+          {{ getErrorMessage("confirmPassword") }}
+        </div>
+        }
+      </div>
+
+      <!-- Terms and Privacy -->
+      <div class="terms-field">
+        <mat-checkbox formControlName="agreeToTerms">
+          I agree to the
+          <a href="#" class="link">Terms of Service</a>
+          and
+          <a href="#" class="link">Privacy Policy</a>
+        </mat-checkbox>
+      </div>
+
+      <!-- Submit Button -->
+      <button
+        type="submit"
+        class="submit-button"
+        [disabled]="!registrationForm.valid || isSubmitting"
+      >
+        {{ isSubmitting ? "Creating Account..." : "Create Account" }}
+      </button>
+
+      <!-- Login Link -->
+      <div class="login-link">
+        Already have an account?
+        <a (click)="navigateToLogin()" class="link">Login</a>
+      </div>
+    </form>
+  </div>
+</div>

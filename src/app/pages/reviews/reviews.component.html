@@ -1,0 +1,243 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Ratings & Reviews</h1>
+        <p class="page-subtitle">
+          See what your customers are saying about your services
+        </p>
+      </div>
+      <div class="header-right">
+        <span class="welcome-text">Welcome, {{ userName }}</span>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('/partner/profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Reviews Content -->
+    <div class="reviews-content">
+      <!-- Rating Overview Section -->
+      <div class="rating-overview">
+        <!-- Overall Rating Card -->
+        <div class="overall-rating-card">
+          <div class="rating-header">
+            <h2 class="rating-title">{{ averageRating | number : "1.1-1" }}</h2>
+            <div class="stars-display">
+              @for (star of getStarsArray(Math.round(averageRating)); track
+              $index) {
+              <mat-icon [class.filled]="star" class="star-icon">{{
+                star ? "star" : "star_border"
+              }}</mat-icon>
+              }
+            </div>
+            <p class="review-count">Based on {{ totalReviews }} reviews</p>
+            <div class="rating-increase">
+              <mat-icon class="increase-icon">trending_up</mat-icon>
+              <span>{{ ratingIncrease }}% increase from last month</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Rating Distribution Card -->
+        <div class="distribution-card">
+          <h3 class="distribution-title">Rating Distribution</h3>
+          <p class="distribution-subtitle">Breakdown of your ratings</p>
+
+          <div class="distribution-list">
+            @for (dist of ratingDistribution; track dist.stars) {
+            <div class="distribution-row">
+              <div class="stars-label">
+                <span class="star-number">{{ dist.stars }}</span>
+                <mat-icon class="star-small">star</mat-icon>
+              </div>
+              <div class="progress-bar-container">
+                <div
+                  class="progress-bar"
+                  [style.width.%]="dist.percentage"
+                ></div>
+              </div>
+              <span class="count-label">{{ dist.count }}</span>
+            </div>
+            }
+          </div>
+        </div>
+      </div>
+
+      <!-- Customer Reviews Section -->
+      <div class="reviews-section">
+        <div class="reviews-header">
+          <div class="reviews-header-left">
+            <h3 class="reviews-title">Customer Reviews</h3>
+            <p class="reviews-subtitle">
+              Read and respond to customer feedback
+            </p>
+          </div>
+          <div class="reviews-header-right">
+            <mat-form-field appearance="outline" class="service-filter">
+              <mat-icon matPrefix>filter_list</mat-icon>
+              <mat-label>Filter by Service</mat-label>
+              <mat-select
+                [(ngModel)]="selectedService"
+                (selectionChange)="filterReviews()"
+              >
+                <mat-option value="all">All Services</mat-option>
+                @for (service of services; track service.id) {
+                <mat-option [value]="service.title">{{
+                  service.title
+                }}</mat-option>
+                }
+              </mat-select>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <!-- Reviews List -->
+        <div class="reviews-list">
+          @if (filteredReviews.length === 0) {
+          <div class="empty-state">
+            <mat-icon class="empty-icon">rate_review</mat-icon>
+            <p>No reviews yet</p>
+            <span class="empty-subtitle"
+              >Your reviews will appear here once customers rate your
+              services</span
+            >
+          </div>
+          } @else { @for (review of filteredReviews; track review.id) {
+          <div class="review-card">
+            <div class="review-header">
+              <div class="customer-info">
+                <div class="customer-avatar">{{ review.customerInitials }}</div>
+                <div class="customer-details">
+                  <h4 class="customer-name">{{ review.customerName }}</h4>
+                  <div class="review-stars">
+                    @for (star of getStarsArray(review.rating); track $index) {
+                    <mat-icon [class.filled]="star" class="star-icon-small">{{
+                      star ? "star" : "star_border"
+                    }}</mat-icon>
+                    }
+                  </div>
+                  <p class="service-name">{{ review.serviceName }}</p>
+                </div>
+              </div>
+              <div class="review-date">{{ formatDate(review.date) }}</div>
+            </div>
+
+            <div class="review-body">
+              <p class="review-comment">{{ review.comment }}</p>
+            </div>
+
+            <!-- Partner Response Section -->
+            @if (review.partnerResponse && respondingToReview !== review.id) {
+            <div class="partner-response-display">
+              <div class="response-header">
+                <mat-icon class="response-icon">reply</mat-icon>
+                <span class="response-label">Your Response</span>
+                <span class="response-date">{{
+                  formatDate(review.responseDate!)
+                }}</span>
+              </div>
+              <p class="response-text">{{ review.partnerResponse }}</p>
+            </div>
+            }
+
+            <!-- Response Form -->
+            @if (respondingToReview === review.id) {
+            <div class="response-form">
+              <textarea
+                class="response-textarea"
+                [(ngModel)]="responseText"
+                placeholder="Write your response..."
+                rows="3"
+              ></textarea>
+              <div class="response-actions">
+                <button
+                  mat-stroked-button
+                  (click)="cancelResponse()"
+                  class="cancel-btn"
+                >
+                  Cancel
+                </button>
+                <button
+                  mat-raised-button
+                  (click)="submitResponse(review.id)"
+                  class="submit-btn"
+                  [disabled]="!responseText.trim()"
+                >
+                  <mat-icon>send</mat-icon>
+                  Submit Response
+                </button>
+              </div>
+            </div>
+            }
+
+            <!-- Response Button -->
+            @if (!review.partnerResponse && respondingToReview !== review.id) {
+            <button
+              mat-stroked-button
+              (click)="startResponse(review.id)"
+              class="respond-btn"
+            >
+              <mat-icon>reply</mat-icon>
+              Respond to Review
+            </button>
+            } @else if (review.partnerResponse && respondingToReview !==
+            review.id) {
+            <button
+              mat-stroked-button
+              (click)="startResponse(review.id)"
+              class="respond-btn"
+            >
+              <mat-icon>edit</mat-icon>
+              Edit Response
+            </button>
+            }
+          </div>
+          } }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

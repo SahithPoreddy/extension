@@ -1,0 +1,261 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <button mat-icon-button class="logo-button" (click)="navigateToHome()">
+      <div class="logo">UF</div>
+    </button>
+    <button mat-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Results
+    </button>
+  </div>
+</header>
+
+<div class="payment-container">
+  <h1 class="page-title">Payment</h1>
+
+  <div class="payment-content">
+    <!-- Left Column: Payment Methods -->
+    <div class="payment-methods-section">
+      <div class="methods-card">
+        <h2 class="card-title">Payment Method</h2>
+
+        <!-- Credit/Debit Card Option -->
+        <div
+          class="payment-option"
+          [class.selected]="selectedPaymentMethod === 'card'"
+          (click)="selectPaymentMethod('card')"
+        >
+          <div class="option-icon">
+            <mat-icon>credit_card</mat-icon>
+          </div>
+          <div class="option-content">
+            <div class="option-title">Credit/Debit Card</div>
+            <div class="option-subtitle">Pay with your card</div>
+          </div>
+          <div class="option-radio">
+            <div
+              class="radio-button"
+              [class.checked]="selectedPaymentMethod === 'card'"
+            ></div>
+          </div>
+        </div>
+
+        <!-- UPI Option -->
+        <div
+          class="payment-option"
+          [class.selected]="selectedPaymentMethod === 'upi'"
+          (click)="selectPaymentMethod('upi')"
+        >
+          <div class="option-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="option-content">
+            <div class="option-title">UPI</div>
+            <div class="option-subtitle">Pay via UPI</div>
+          </div>
+          <div class="option-radio">
+            <div
+              class="radio-button"
+              [class.checked]="selectedPaymentMethod === 'upi'"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Pay on Service Option -->
+        <div
+          class="payment-option"
+          [class.selected]="selectedPaymentMethod === 'cash'"
+          (click)="selectPaymentMethod('cash')"
+        >
+          <div class="option-icon">
+            <mat-icon>payments</mat-icon>
+          </div>
+          <div class="option-content">
+            <div class="option-title">Pay on Service</div>
+            <div class="option-subtitle">Cash payment after service</div>
+          </div>
+          <div class="option-radio">
+            <div
+              class="radio-button"
+              [class.checked]="selectedPaymentMethod === 'cash'"
+            ></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Details Form -->
+      @if (selectedPaymentMethod === 'card') {
+      <div class="payment-details-card">
+        <h2 class="card-title">Card Details</h2>
+
+        <form [formGroup]="cardForm" class="payment-form">
+          <div class="form-field">
+            <label>Card Number</label>
+            <input
+              type="text"
+              formControlName="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              maxlength="19"
+              (input)="formatCardNumber($event)"
+              [class.error]="
+                cardForm.get('cardNumber')?.invalid &&
+                cardForm.get('cardNumber')?.touched
+              "
+            />
+            @if (cardForm.get('cardNumber')?.invalid &&
+            cardForm.get('cardNumber')?.touched) {
+            <span class="error-message">{{ getCardError("cardNumber") }}</span>
+            }
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>Expiry Date</label>
+              <input
+                type="text"
+                formControlName="expiryDate"
+                placeholder="MM/YY"
+                maxlength="5"
+                (input)="formatExpiryDate($event)"
+                [class.error]="
+                  cardForm.get('expiryDate')?.invalid &&
+                  cardForm.get('expiryDate')?.touched
+                "
+              />
+              @if (cardForm.get('expiryDate')?.invalid &&
+              cardForm.get('expiryDate')?.touched) {
+              <span class="error-message">{{
+                getCardError("expiryDate")
+              }}</span>
+              }
+            </div>
+
+            <div class="form-field">
+              <label>CVV</label>
+              <input
+                type="text"
+                formControlName="cvv"
+                placeholder="123"
+                maxlength="3"
+                [class.error]="
+                  cardForm.get('cvv')?.invalid && cardForm.get('cvv')?.touched
+                "
+              />
+              @if (cardForm.get('cvv')?.invalid && cardForm.get('cvv')?.touched)
+              {
+              <span class="error-message">{{ getCardError("cvv") }}</span>
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Cardholder Name</label>
+            <input
+              type="text"
+              formControlName="cardholderName"
+              placeholder="Name on card"
+              [class.error]="
+                cardForm.get('cardholderName')?.invalid &&
+                cardForm.get('cardholderName')?.touched
+              "
+            />
+            @if (cardForm.get('cardholderName')?.invalid &&
+            cardForm.get('cardholderName')?.touched) {
+            <span class="error-message">{{
+              getCardError("cardholderName")
+            }}</span>
+            }
+          </div>
+        </form>
+      </div>
+      }
+
+      <!-- UPI Details -->
+      @if (selectedPaymentMethod === 'upi') {
+      <div class="payment-details-card">
+        <h2 class="card-title">UPI Payment</h2>
+
+        <div class="upi-qr-section">
+          <div class="qr-code">
+            <img
+              src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Crect width='200' height='200' fill='%23fff'/%3E%3Cpath d='M20,20h20v20h-20zM60,20h20v20h-20zM100,20h20v20h-20zM140,20h20v20h-20zM180,20h20v20h-20zM20,60h20v20h-20zM60,60h20v20h-20zM100,60h20v20h-20zM140,60h20v20h-20zM180,60h20v20h-20zM20,100h20v20h-20zM60,100h20v20h-20zM100,100h20v20h-20zM140,100h20v20h-20zM180,100h20v20h-20zM20,140h20v20h-20zM60,140h20v20h-20zM100,140h20v20h-20zM140,140h20v20h-20zM180,140h20v20h-20zM20,180h20v20h-20zM60,180h20v20h-20zM100,180h20v20h-20zM140,180h20v20h-20zM180,180h20v20h-20z' fill='%23000'/%3E%3C/svg%3E"
+              alt="QR Code"
+            />
+          </div>
+          <p class="qr-instruction">Scan QR code with any UPI app</p>
+          <div class="or-divider">OR</div>
+        </div>
+
+        <form [formGroup]="upiForm" class="payment-form">
+          <div class="form-field">
+            <label>Enter UPI ID</label>
+            <input
+              type="text"
+              formControlName="upiId"
+              placeholder="yourname@bank"
+              [class.error]="
+                upiForm.get('upiId')?.invalid && upiForm.get('upiId')?.touched
+              "
+            />
+            @if (upiForm.get('upiId')?.invalid && upiForm.get('upiId')?.touched)
+            {
+            <span class="error-message">{{ getUpiError() }}</span>
+            }
+            <small class="field-hint"
+              >Enter your UPI ID (e.g., username@paytm)</small
+            >
+          </div>
+        </form>
+      </div>
+      }
+
+      <!-- Pay on Service Message -->
+      @if (selectedPaymentMethod === 'cash') {
+      <div class="payment-details-card">
+        <h2 class="card-title">Pay on Service</h2>
+
+        <div class="cash-info">
+          <mat-icon class="info-icon">info</mat-icon>
+          <div class="info-content">
+            <p class="info-text">You can pay after the service is completed</p>
+            <p class="info-subtext">
+              Please keep ₹{{ totalAmount }} ready in cash for the service
+              professional
+            </p>
+          </div>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Right Column: Amount & Payment Button -->
+    <div class="payment-summary-section">
+      <div class="summary-card">
+        <h2 class="card-title">Amount to Pay</h2>
+
+        <div class="amount-display">₹{{ totalAmount }}</div>
+
+        <button
+          mat-raised-button
+          class="pay-button"
+          [disabled]="!canProceed() || isProcessing"
+          (click)="processPayment()"
+        >
+          {{ selectedPaymentMethod === "cash" ? "Confirm Booking" : "Pay Now" }}
+        </button>
+
+        <div class="security-info">
+          <mat-icon>lock</mat-icon>
+          <span>Your payment is secure and encrypted</span>
+        </div>
+
+        @if (selectedPaymentMethod === 'cash') {
+        <div class="cash-notice">
+          <p>No payment required now</p>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</div>

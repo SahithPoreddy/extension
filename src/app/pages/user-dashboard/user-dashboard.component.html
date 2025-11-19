@@ -1,0 +1,253 @@
+<div class="dashboard-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo" (click)="navigateToHome()">
+        <div class="logo-square">
+          <span>UF</span>
+        </div>
+        <span class="logo-text">UrbanFix</span>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search for services..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearch()"
+          (focus)="onSearch()"
+        />
+        @if (showSearchResults) {
+        <div class="search-results">
+          @if (searchResults.length > 0) { @for (service of searchResults; track
+          service.id) {
+          <div class="search-result-item" (click)="selectService(service)">
+            <img [src]="service.image" [alt]="service.name" />
+            <div class="search-result-info">
+              <div class="search-result-name">{{ service.name }}</div>
+              <div class="search-result-price">
+                Starting at ₹{{ service.price }}
+              </div>
+            </div>
+          </div>
+          } } @else {
+          <div class="no-results">No services found</div>
+          }
+        </div>
+        }
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button
+          class="icon-button"
+          [matBadge]="notificationCount"
+          matBadgeColor="warn"
+          (click)="navigateTo('/user/notifications')"
+        >
+          <mat-icon>notifications</mat-icon>
+        </button>
+        <button class="profile-button" (click)="navigateToProfile()">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Location & Welcome Section -->
+    <div class="welcome-section">
+      <div class="location">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ location }}</span>
+        <button class="change-link" (click)="changeLocation()">Change</button>
+      </div>
+      <h1 class="welcome-title">Welcome back!</h1>
+      <p class="welcome-subtitle">What would you like to fix today?</p>
+    </div>
+
+    <!-- Quick Actions -->
+    <div class="quick-actions">
+      @for (action of quickActions; track action.route) {
+      <div class="action-card" (click)="navigateTo(action.route)">
+        <mat-icon class="action-icon">{{ action.icon }}</mat-icon>
+        <span class="action-label">{{ action.label }}</span>
+      </div>
+      }
+    </div>
+
+    <!-- Recent Bookings -->
+    @if (recentBookings.length > 0) {
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Recent Bookings</h2>
+        <button class="view-all-link" (click)="viewAllBookings()">
+          View All
+        </button>
+      </div>
+
+      <div class="bookings-grid">
+        @for (booking of recentBookings; track booking.id) {
+        <div class="booking-card">
+          <div class="booking-header">
+            <div>
+              <h3 class="booking-service">{{ booking.serviceName }}</h3>
+              <p class="booking-provider">Provider: {{ booking.provider }}</p>
+            </div>
+            <span class="booking-status" [class]="'status-' + booking.status">
+              {{ booking.status }}
+            </span>
+          </div>
+          <div class="booking-footer">
+            <span class="booking-date">{{ booking.date }}</span>
+            @if (booking.rating) {
+            <div class="booking-rating">
+              <mat-icon class="star-icon">star</mat-icon>
+              <span>{{ booking.rating }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+    }
+
+    <!-- Recommended Services -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">
+          <mat-icon class="section-icon">trending_up</mat-icon>
+          Recommended for You
+        </h2>
+      </div>
+
+      <div class="services-grid">
+        @for (service of recommendedServices; track service.id) {
+        <div class="service-card" (click)="viewServiceDetails(service.id)">
+          <div class="service-image-container">
+            <img
+              [src]="service.image"
+              [alt]="service.name"
+              class="service-image"
+            />
+            @if (service.badge) {
+            <span class="service-badge">{{ service.badge }}</span>
+            } @if (service.discount) {
+            <span class="service-discount">{{ service.discount }}</span>
+            }
+          </div>
+          <div class="service-content">
+            <h3 class="service-name">{{ service.name }}</h3>
+            <div class="service-rating">
+              <mat-icon class="star-icon">star</mat-icon>
+              <span>{{ service.rating }}</span>
+              <span class="reviews">({{ service.reviews }})</span>
+            </div>
+            <div class="service-duration">
+              <mat-icon class="duration-icon">schedule</mat-icon>
+              <span>{{ service.duration }}</span>
+            </div>
+            <div class="service-pricing">
+              <span class="starting-at-label">Starting at</span>
+              <div class="price-row">
+                @if (service.originalPrice) {
+                <span class="original-price">₹{{ service.originalPrice }}</span>
+                }
+                <span class="current-price">₹{{ service.price }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Popular Categories -->
+    <section class="section">
+      <h2 class="section-title">Popular Categories</h2>
+      <div class="categories-grid">
+        @for (category of popularCategories; track category.id) {
+        <div class="category-card" (click)="filterByCategory(category.id)">
+          <div class="category-icon-wrapper">
+            <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
+          </div>
+          <span class="category-name">{{ category.name }}</span>
+        </div>
+        }
+      </div>
+    </section>
+  </main>
+
+  <!-- Floating Chat Button -->
+  @if (!isChatOpen) {
+  <button class="chat-fab" (click)="toggleChat()">
+    <mat-icon>support_agent</mat-icon>
+  </button>
+  }
+
+  <!-- Chat Window -->
+  @if (isChatOpen) {
+  <div class="chat-window">
+    <!-- Chat Header -->
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-avatar">
+          <mat-icon>support_agent</mat-icon>
+        </div>
+        <div class="chat-title-section">
+          <h3 class="chat-title">Live Support</h3>
+          <span class="chat-status">
+            <span class="status-dot"></span>
+            Online
+          </span>
+        </div>
+      </div>
+      <button class="close-chat" (click)="closeChat()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Chat Messages -->
+    <div class="chat-messages">
+      @for (message of chatMessages; track $index) {
+      <div
+        class="message"
+        [class.user-message]="message.sender === 'user'"
+        [class.support-message]="message.sender === 'support'"
+      >
+        <div class="message-bubble">
+          <p class="message-text">{{ message.text }}</p>
+          <span class="message-time">{{ message.time }}</span>
+        </div>
+      </div>
+      }
+    </div>
+
+    <!-- Chat Input -->
+    <div class="chat-input-container">
+      <input
+        type="text"
+        class="chat-input"
+        placeholder="Type your message..."
+        [(ngModel)]="chatInput"
+        (keyup.enter)="sendMessage()"
+      />
+      <button
+        class="send-button"
+        (click)="sendMessage()"
+        [disabled]="!chatInput.trim()"
+      >
+        <mat-icon>send</mat-icon>
+      </button>
+    </div>
+
+    <div class="chat-footer">We typically reply within minutes</div>
+  </div>
+  }
+</div>

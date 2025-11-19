@@ -1,0 +1,136 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Service Portfolio</h1>
+        <p class="page-subtitle">Showcase your work with high-quality images</p>
+      </div>
+      <div class="header-right">
+        <button
+          mat-raised-button
+          class="upload-btn"
+          (click)="openUploadDialog()"
+        >
+          <mat-icon>add_photo_alternate</mat-icon>
+          Upload Photos
+        </button>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Portfolio Content -->
+    <div class="portfolio-content">
+      <!-- Tips Section -->
+      <div class="tips-card">
+        <div class="tips-header">
+          <mat-icon class="tips-icon">lightbulb</mat-icon>
+          <h3>Tips for Great Portfolio Images</h3>
+        </div>
+        <ul class="tips-list">
+          <li>Use high-resolution images (minimum 1200×800 pixels)</li>
+          <li>Show before and after shots when possible</li>
+          <li>Ensure good lighting and clear focus</li>
+          <li>Include a variety of your work across different projects</li>
+          <li>
+            Add descriptive captions to help customers understand your work
+          </li>
+        </ul>
+      </div>
+
+      <!-- Portfolio Count -->
+      <div class="portfolio-header">
+        <h2 class="section-title">
+          Your Portfolio ({{ portfolioItems.length }} photos)
+        </h2>
+      </div>
+
+      <!-- Portfolio Grid -->
+      @if (portfolioItems.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">photo_library</mat-icon>
+        <h2>No Portfolio Images Yet</h2>
+        <p>
+          Upload your first image to showcase your work to potential customers
+        </p>
+        <button
+          mat-raised-button
+          class="upload-btn"
+          (click)="openUploadDialog()"
+        >
+          <mat-icon>add_photo_alternate</mat-icon>
+          Upload Your First Image
+        </button>
+      </div>
+      } @else {
+      <div class="portfolio-grid">
+        @for (item of portfolioItems; track item.id; let i = $index) {
+        <div class="portfolio-card" (click)="openViewEditDialog(item, i)">
+          <div class="image-container">
+            <img
+              [src]="item.imageUrl"
+              [alt]="item.caption || 'Portfolio image'"
+              class="portfolio-image"
+            />
+            <div class="image-overlay">
+              <mat-icon class="view-icon">visibility</mat-icon>
+              <span class="view-text">Click to view & edit</span>
+            </div>
+          </div>
+          <div class="card-footer">
+            <p class="image-caption">{{ item.caption || "No caption" }}</p>
+            <p class="upload-date">
+              <mat-icon class="date-icon">event</mat-icon>
+              Uploaded: {{ item.uploadedDate }}
+            </p>
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

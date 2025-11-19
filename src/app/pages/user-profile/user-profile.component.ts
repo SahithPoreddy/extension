@@ -1,0 +1,495 @@
+import { Component, OnInit, ViewContainerRef, ComponentRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatIconModule } from '@angular/material/icon';
+import { MatButtonModule } from '@angular/material/button';
+import { MatBadgeModule } from '@angular/material/badge';
+import { AuthService } from '../../services/auth.service';
+
+interface Address {
+  id: string;
+  type: string;
+  addressLine1: string;
+  addressLine2: string;
+  landmark?: string;
+  city: string;
+  state: string;
+  pincode: string;
+  isDefault?: boolean;
+}
+
+interface QuickAction {
+  icon: string;
+  title: string;
+  description: string;
+  route: string;
+}
+
+@Component({
+  selector: 'app-user-profile',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatBadgeModule,
+    AddAddressDialogComponent
+  ],
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.css'
+})
+export class UserProfileComponent implements OnInit {
+  userName = 'Priya Sharma';
+  userEmail = 'priya.sharma@example.com';
+  userPhone = '+91 98765 43210';
+  isVerified = true;
+  isPremiumMember = true;
+  
+  bookingsCount = 24;
+  avgRating = 4.8;
+  rewardsBalance = 250;
+
+  savedAddresses: Address[] = [
+    {
+      id: '1',
+      type: 'Home',
+      addressLine1: '123 Main St, Apartment 4B',
+      addressLine2: 'Mumbai, Maharashtra 400001',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400001',
+      isDefault: true
+    },
+    {
+      id: '2',
+      type: 'Office',
+      addressLine1: '456 Business Park, Tower A, 5th Floor',
+      addressLine2: 'Mumbai, Maharashtra 400002',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pincode: '400002'
+    }
+  ];
+
+  quickActions: QuickAction[] = [
+    {
+      icon: 'credit_card',
+      title: 'Payment Methods',
+      description: 'Manage cards and wallets',
+      route: '/user/payment-methods'
+    },
+    {
+      icon: 'calendar_today',
+      title: 'My Bookings',
+      description: 'View all service bookings',
+      route: '/user/bookings'
+    },
+    {
+      icon: 'help_outline',
+      title: 'Help & Support',
+      description: 'Get help with your services',
+      route: '/user/support'
+    }
+  ];
+
+  showAddAddressDialog = false;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.userName = user.userName;
+      this.userEmail = user.email;
+    }
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/user/dashboard']);
+  }
+
+  navigateTo(route: string): void {
+    this.router.navigate([route]);
+  }
+
+  editProfile(): void {
+    // Navigate to edit profile page (to be implemented)
+    console.log('Edit profile clicked');
+  }
+
+  openAddAddressDialog(): void {
+    this.showAddAddressDialog = true;
+  }
+
+  closeAddAddressDialog(): void {
+    this.showAddAddressDialog = false;
+  }
+
+  onAddressSaved(address: Address): void {
+    this.savedAddresses.push(address);
+    this.closeAddAddressDialog();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/user/login']);
+  }
+}
+
+// Add Address Dialog Component - Exported for use in template
+export { AddAddressDialogComponent };
+
+@Component({
+  selector: 'app-add-address-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule
+  ],
+  template: `
+    <div class="dialog-overlay" (click)="onCancel()">
+      <div class="dialog-container" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>Add New Address</h2>
+          <button class="close-button" (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="addressForm" (ngSubmit)="onSubmit()">
+          <div class="form-row">
+            <div class="form-field">
+              <label>Address Type <span class="required">*</span></label>
+              <select formControlName="type">
+                <option value="">Select type</option>
+                <option value="Home">Home</option>
+                <option value="Office">Office</option>
+                <option value="Other">Other</option>
+              </select>
+              @if (getErrorMessage('type')) {
+                <div class="error-message">{{ getErrorMessage('type') }}</div>
+              }
+            </div>
+
+            <div class="form-field">
+              <label>Pincode <span class="required">*</span></label>
+              <input
+                type="text"
+                formControlName="pincode"
+                placeholder="Enter pincode"
+                maxlength="6"
+              />
+              @if (getErrorMessage('pincode')) {
+                <div class="error-message">{{ getErrorMessage('pincode') }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="form-field">
+            <label>Address Line 1 <span class="required">*</span></label>
+            <input
+              type="text"
+              formControlName="addressLine1"
+              placeholder="House/Flat No., Building Name"
+            />
+            @if (getErrorMessage('addressLine1')) {
+              <div class="error-message">{{ getErrorMessage('addressLine1') }}</div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label>Address Line 2 <span class="required">*</span></label>
+            <input
+              type="text"
+              formControlName="addressLine2"
+              placeholder="Street, Area"
+            />
+            @if (getErrorMessage('addressLine2')) {
+              <div class="error-message">{{ getErrorMessage('addressLine2') }}</div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label>Landmark</label>
+            <input
+              type="text"
+              formControlName="landmark"
+              placeholder="Nearby landmark (optional)"
+            />
+          </div>
+
+          <div class="form-row">
+            <div class="form-field">
+              <label>City <span class="required">*</span></label>
+              <input
+                type="text"
+                formControlName="city"
+                placeholder="Enter city"
+              />
+              @if (getErrorMessage('city')) {
+                <div class="error-message">{{ getErrorMessage('city') }}</div>
+              }
+            </div>
+
+            <div class="form-field">
+              <label>State <span class="required">*</span></label>
+              <input
+                type="text"
+                formControlName="state"
+                placeholder="Enter state"
+              />
+              @if (getErrorMessage('state')) {
+                <div class="error-message">{{ getErrorMessage('state') }}</div>
+              }
+            </div>
+          </div>
+
+          <div class="dialog-actions">
+            <button type="button" class="cancel-button" (click)="onCancel()">
+              Cancel
+            </button>
+            <button
+              type="submit"
+              class="save-button"
+              [disabled]="!addressForm.valid"
+            >
+              Save Address
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .dialog-container {
+      background: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 600px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .dialog-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+
+    .close-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+
+    .close-button:hover {
+      background: #e0e0e0;
+    }
+
+    .close-button mat-icon {
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+      color: #666;
+    }
+
+    form {
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .form-row {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px;
+    }
+
+    .form-field {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    label {
+      font-size: 14px;
+      font-weight: 500;
+      color: #333;
+    }
+
+    .required {
+      color: #f44336;
+    }
+
+    input, select {
+      padding: 10px 12px;
+      font-size: 14px;
+      border: 1px solid #e0e0e0;
+      border-radius: 6px;
+      outline: none;
+      transition: all 0.3s ease;
+      background-color: #f8f9fa;
+    }
+
+    input:focus, select:focus {
+      border-color: #ff9800;
+      background-color: white;
+    }
+
+    select {
+      cursor: pointer;
+    }
+
+    .error-message {
+      font-size: 12px;
+      color: #f44336;
+      margin-top: 4px;
+    }
+
+    .dialog-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 8px;
+    }
+
+    .cancel-button, .save-button {
+      flex: 1;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+
+    .cancel-button {
+      background: white;
+      border: 1px solid #e0e0e0;
+      color: #666;
+    }
+
+    .cancel-button:hover {
+      background: #f5f5f5;
+    }
+
+    .save-button {
+      background: #ff9800;
+      border: none;
+      color: white;
+    }
+
+    .save-button:hover:not(:disabled) {
+      background: #f57c00;
+    }
+
+    .save-button:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+      opacity: 0.6;
+    }
+
+    @media (max-width: 768px) {
+      .form-row {
+        grid-template-columns: 1fr;
+      }
+    }
+  `]
+})
+class AddAddressDialogComponent implements OnInit {
+  addressForm!: FormGroup;
+
+  constructor(
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.addressForm = this.fb.group({
+      type: ['', Validators.required],
+      addressLine1: ['', Validators.required],
+      addressLine2: ['', Validators.required],
+      landmark: [''],
+      city: ['', Validators.required],
+      state: ['', Validators.required],
+      pincode: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+    });
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.addressForm.get(fieldName);
+    
+    if (!control || !control.errors || !control.touched) {
+      return '';
+    }
+
+    if (control.hasError('required')) {
+      return 'This field is required';
+    }
+
+    if (fieldName === 'pincode' && control.hasError('pattern')) {
+      return 'Please enter a valid 6-digit pincode';
+    }
+
+    return '';
+  }
+
+  onSubmit(): void {
+    if (this.addressForm.valid) {
+      const newAddress: Address = {
+        id: Date.now().toString(),
+        type: this.addressForm.value.type,
+        addressLine1: this.addressForm.value.addressLine1,
+        addressLine2: this.addressForm.value.addressLine2,
+        landmark: this.addressForm.value.landmark,
+        city: this.addressForm.value.city,
+        state: this.addressForm.value.state,
+        pincode: this.addressForm.value.pincode
+      };
+
+      // In a real app, save to backend and update parent
+      // For now, just close the dialog
+      this.onCancel();
+    }
+  }
+
+  onCancel(): void {
+    // This will be handled by parent component
+    // Emit event or use service to close
+  }
+}

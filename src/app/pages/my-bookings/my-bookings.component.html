@@ -1,0 +1,243 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">My Bookings</h1>
+        <p class="page-subtitle">Manage and track all your service bookings</p>
+      </div>
+      <div class="header-right">
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Bookings Content -->
+    <div class="bookings-content">
+      <!-- Search and Filter Bar -->
+      <div class="search-filter-bar">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix class="search-icon">search</mat-icon>
+          <input
+            matInput
+            [(ngModel)]="searchQuery"
+            (ngModelChange)="onSearchChange()"
+            placeholder="Search by client name, service, or booking ID..."
+          />
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="filter-field">
+          <mat-label>All Time</mat-label>
+          <mat-select>
+            <mat-option value="all">All Time</mat-option>
+            <mat-option value="today">Today</mat-option>
+            <mat-option value="week">This Week</mat-option>
+            <mat-option value="month">This Month</mat-option>
+          </mat-select>
+        </mat-form-field>
+      </div>
+
+      <!-- Status Tabs -->
+      <mat-tab-group
+        class="status-tabs"
+        (selectedIndexChange)="onTabChange($event)"
+        animationDuration="300ms"
+      >
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label">All ({{ getTabCount("All") }})</span>
+          </ng-template>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label"
+              >Pending ({{ getTabCount("Pending") }})</span
+            >
+          </ng-template>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label"
+              >Upcoming ({{ getTabCount("Upcoming") }})</span
+            >
+          </ng-template>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label"
+              >Completed ({{ getTabCount("Completed") }})</span
+            >
+          </ng-template>
+        </mat-tab>
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label"
+              >Canceled ({{ getTabCount("Canceled") }})</span
+            >
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+
+      <!-- Bookings List -->
+      @if (filteredBookings.length === 0) {
+      <div class="empty-state">
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <h2>No Bookings Found</h2>
+        <p>
+          {{
+            searchQuery
+              ? "Try adjusting your search criteria"
+              : "You don't have any bookings yet"
+          }}
+        </p>
+      </div>
+      } @else {
+      <div class="bookings-list">
+        @for (booking of filteredBookings; track booking.id) {
+        <div class="booking-card">
+          <div class="card-header">
+            <div class="customer-info">
+              <div class="customer-avatar">
+                <mat-icon>person</mat-icon>
+              </div>
+              <div class="customer-details">
+                <h3 class="customer-name">{{ booking.customerName }}</h3>
+                <span
+                  [class]="'status-badge ' + getStatusClass(booking.status)"
+                >
+                  <mat-icon class="status-icon">{{
+                    getStatusIcon(booking.status)
+                  }}</mat-icon>
+                  {{ booking.status }}
+                </span>
+              </div>
+            </div>
+            <div class="booking-price">₹{{ booking.price }}</div>
+          </div>
+
+          <div class="card-body">
+            <div class="service-info">
+              <h4 class="service-name">{{ booking.serviceName }}</h4>
+              <span class="service-type">{{ booking.serviceType }}</span>
+            </div>
+
+            <div class="booking-details">
+              <div class="detail-row">
+                <mat-icon class="detail-icon">calendar_today</mat-icon>
+                <span class="detail-label">Date:</span>
+                <span class="detail-value">{{
+                  formatDate(booking.bookingDate)
+                }}</span>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon class="detail-icon">access_time</mat-icon>
+                <span class="detail-label">Time:</span>
+                <span class="detail-value">{{
+                  formatTime(booking.bookingTime)
+                }}</span>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon class="detail-icon">location_on</mat-icon>
+                <span class="detail-label">Address:</span>
+                <span class="detail-value">{{ booking.address }}</span>
+              </div>
+
+              <div class="detail-row">
+                <mat-icon class="detail-icon">phone</mat-icon>
+                <span class="detail-label">Phone:</span>
+                <span class="detail-value">{{ booking.phoneNumber }}</span>
+              </div>
+            </div>
+
+            @if (booking.specialInstructions) {
+            <div class="special-instructions">
+              <div class="instructions-header">
+                <mat-icon class="instructions-icon">info</mat-icon>
+                <span class="instructions-title">Special Instructions:</span>
+              </div>
+              <p class="instructions-text">{{ booking.specialInstructions }}</p>
+            </div>
+            }
+          </div>
+
+          <div class="card-footer">
+            @if (canUpdateStatus(booking)) {
+            <button
+              mat-stroked-button
+              [matMenuTriggerFor]="statusMenu"
+              class="update-status-btn"
+            >
+              <mat-icon>edit</mat-icon>
+              Update Status
+            </button>
+            <mat-menu #statusMenu="matMenu">
+              @for (status of getNextStatus(booking.status); track status) {
+              <button
+                mat-menu-item
+                (click)="updateBookingStatus(booking, status)"
+              >
+                <mat-icon>{{ getStatusIcon(status) }}</mat-icon>
+                <span>{{ status }}</span>
+              </button>
+              }
+            </mat-menu>
+            } @else {
+            <div class="status-final">
+              <mat-icon class="final-icon">{{
+                getStatusIcon(booking.status)
+              }}</mat-icon>
+              <span class="final-text">{{ booking.status }}</span>
+            </div>
+            }
+          </div>
+        </div>
+        }
+      </div>
+      }
+    </div>
+  </div>
+</div>

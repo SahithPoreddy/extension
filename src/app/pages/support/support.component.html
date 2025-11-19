@@ -1,0 +1,193 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Support & Help Center</h1>
+        <p class="page-subtitle">
+          Find answers to common questions or contact our support team
+        </p>
+      </div>
+      <div class="header-right">
+        <span class="welcome-text">Welcome, {{ userName }}</span>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('/partner/profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Support Content -->
+    <div class="support-content">
+      <!-- Contact Options -->
+      <div class="contact-options">
+        <div class="contact-card">
+          <div class="contact-icon phone-icon">
+            <mat-icon>phone</mat-icon>
+          </div>
+          <h3 class="contact-title">Call Us</h3>
+          <p class="contact-time">Mon-Sat, 9 AM - 6 PM</p>
+          <a href="tel:18001234567" class="contact-link">1800-123-4567</a>
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon email-icon">
+            <mat-icon>email</mat-icon>
+          </div>
+          <h3 class="contact-title">Email Us</h3>
+          <p class="contact-time">24/7 hour response time</p>
+          <a href="mailto:support@urbanfix.com" class="contact-link"
+            >support&#64;urbanfix.com</a
+          >
+        </div>
+
+        <div class="contact-card">
+          <div class="contact-icon chat-icon">
+            <mat-icon>chat</mat-icon>
+          </div>
+          <h3 class="contact-title">Live Chat</h3>
+          <p class="contact-time">Chat with our team</p>
+          <button mat-stroked-button class="chat-btn">Start Chat</button>
+        </div>
+      </div>
+
+      <!-- Search Bar -->
+      <div class="search-section">
+        <mat-form-field appearance="outline" class="search-field">
+          <mat-icon matPrefix>search</mat-icon>
+          <input
+            matInput
+            placeholder="Search for help articles, FAQs..."
+            [(ngModel)]="searchQuery"
+          />
+        </mat-form-field>
+      </div>
+
+      <!-- FAQ Sections -->
+      <div class="faq-sections">
+        @for (category of faqCategories; track category.title) {
+        <div class="faq-category">
+          <div class="category-header">
+            <div class="category-icon">
+              <mat-icon>{{ category.icon }}</mat-icon>
+            </div>
+            <div class="category-info">
+              <h3 class="category-title">{{ category.title }}</h3>
+              <p class="category-count">{{ category.articleCount }} articles</p>
+            </div>
+          </div>
+
+          <mat-accordion class="faq-accordion">
+            @for (faq of category.questions; track faq.question) {
+            <mat-expansion-panel>
+              <mat-expansion-panel-header>
+                <mat-panel-title>
+                  {{ faq.question }}
+                </mat-panel-title>
+              </mat-expansion-panel-header>
+              <p class="faq-answer">{{ faq.answer }}</p>
+            </mat-expansion-panel>
+            }
+          </mat-accordion>
+        </div>
+        }
+      </div>
+
+      <!-- Contact Form -->
+      <div class="contact-form-section">
+        <h3 class="form-title">Still Need Help?</h3>
+        <p class="form-subtitle">
+          Send us a message and we'll get back to you within 24 hours
+        </p>
+
+        <div class="contact-form">
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Subject</mat-label>
+            <input
+              matInput
+              placeholder="Brief description of your issue"
+              [(ngModel)]="contactSubject"
+            />
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="form-field">
+            <mat-label>Message</mat-label>
+            <textarea
+              matInput
+              rows="5"
+              placeholder="Describe your issue in detail..."
+              [(ngModel)]="contactMessage"
+            ></textarea>
+          </mat-form-field>
+
+          <button
+            mat-raised-button
+            class="send-btn"
+            (click)="sendMessage()"
+            [disabled]="!contactSubject.trim() || !contactMessage.trim()"
+          >
+            <mat-icon>send</mat-icon>
+            Send Message
+          </button>
+        </div>
+      </div>
+
+      <!-- Additional Resources -->
+      <div class="resources-section">
+        <h3 class="resources-title">Additional Resources</h3>
+        <div class="resources-grid">
+          <div class="resource-card">
+            <mat-icon class="resource-icon">description</mat-icon>
+            <h4 class="resource-title">Partner Guidelines</h4>
+            <p class="resource-text">All our policies and policies</p>
+          </div>
+          <div class="resource-card">
+            <mat-icon class="resource-icon">groups</mat-icon>
+            <h4 class="resource-title">Partner Community</h4>
+            <p class="resource-text">Connect with other partners</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

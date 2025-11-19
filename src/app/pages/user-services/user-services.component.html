@@ -1,0 +1,201 @@
+<div class="services-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo" (click)="navigateToHome()">
+        <div class="logo-square">
+          <span>UF</span>
+        </div>
+        <span class="logo-text">UrbanFix</span>
+      </div>
+    </div>
+  </header>
+
+  <!-- Back to Home -->
+  <div class="navigation-bar">
+    <button class="back-button" (click)="navigateToHome()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Home
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Search Bar -->
+    <div class="search-section">
+      <div class="search-bar">
+        <mat-icon class="search-icon">search</mat-icon>
+        <input
+          type="text"
+          placeholder="Search for services..."
+          [(ngModel)]="searchQuery"
+          (input)="onSearchChange()"
+        />
+      </div>
+      <button class="filters-toggle" (click)="toggleFilters()">
+        <mat-icon>tune</mat-icon>
+        Filters
+      </button>
+    </div>
+
+    <div class="content-wrapper">
+      <!-- Filters Sidebar -->
+      @if (showFilters) {
+      <aside class="filters-sidebar">
+        <div class="filters-header">
+          <h3>Filters</h3>
+          <button class="clear-filters" (click)="clearFilters()">Clear</button>
+        </div>
+
+        <!-- Price Range Filter -->
+        <div class="filter-group">
+          <h4 class="filter-title">Price Range</h4>
+          <div class="price-inputs">
+            <div class="price-input">
+              <span>₹</span>
+              <input
+                type="number"
+                [(ngModel)]="priceRange.min"
+                (change)="onPriceChange()"
+                min="0"
+              />
+            </div>
+            <span class="price-separator">-</span>
+            <div class="price-input">
+              <span>₹</span>
+              <input
+                type="number"
+                [(ngModel)]="priceRange.max"
+                (change)="onPriceChange()"
+                min="0"
+              />
+            </div>
+          </div>
+          <mat-slider
+            class="price-slider"
+            [min]="0"
+            [max]="2000"
+            [step]="50"
+            [(ngModel)]="priceRange.max"
+            (input)="onPriceChange()"
+          >
+            <input matSliderThumb />
+          </mat-slider>
+          <div class="price-range-labels">
+            <span>₹0</span>
+            <span>₹2000</span>
+          </div>
+        </div>
+
+        <!-- Minimum Rating Filter -->
+        <div class="filter-group">
+          <h4 class="filter-title">Minimum Rating</h4>
+          <div class="rating-options">
+            @for (option of ratingOptions; track option.value) {
+            <label class="rating-option">
+              <input
+                type="radio"
+                name="rating"
+                [value]="option.value"
+                [checked]="selectedMinRating === option.value"
+                (change)="onRatingChange(option.value)"
+              />
+              <mat-icon class="star-icon">star</mat-icon>
+              <span>{{ option.label }}</span>
+            </label>
+            }
+          </div>
+        </div>
+
+        <!-- Category Filter -->
+        <div class="filter-group">
+          <h4 class="filter-title">Category</h4>
+          <div class="category-options">
+            @for (category of categories; track category.id) {
+            <label class="category-option">
+              <mat-checkbox
+                [checked]="isCategorySelected(category.id)"
+                (change)="onCategoryChange(category.id, $event.checked)"
+              >
+                <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
+                <span>{{ category.name }}</span>
+              </mat-checkbox>
+            </label>
+            }
+          </div>
+        </div>
+      </aside>
+      }
+
+      <!-- Services List -->
+      <main class="services-main">
+        <!-- Header with count and sort -->
+        <div class="services-header">
+          <h2 class="services-count">
+            Available Services
+            <span class="count">{{ displayedServices.length }} services</span>
+          </h2>
+          <div class="sort-control">
+            <label>Sort by:</label>
+            <select [(ngModel)]="sortBy" (change)="onSortChange()">
+              <option value="relevance">Relevance</option>
+              <option value="price-low">Price: Low to High</option>
+              <option value="price-high">Price: High to Low</option>
+              <option value="rating">Rating</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Services Grid -->
+        @if (displayedServices.length > 0) {
+        <div class="services-grid">
+          @for (service of displayedServices; track service.id) {
+          <div class="service-card" (click)="viewServiceDetails(service.id)">
+            <div class="service-image-container">
+              <img
+                [src]="service.image"
+                [alt]="service.name"
+                class="service-image"
+              />
+              @if (service.badge) {
+              <span class="service-badge">{{ service.badge }}</span>
+              } @if (service.discount) {
+              <span class="service-discount">{{ service.discount }}</span>
+              }
+            </div>
+            <div class="service-content">
+              <h3 class="service-name">{{ service.name }}</h3>
+              <div class="service-rating">
+                <mat-icon class="star-icon">star</mat-icon>
+                <span class="rating-value">{{ service.rating }}</span>
+                <span class="reviews">({{ service.reviews }})</span>
+              </div>
+              <div class="service-duration">
+                <mat-icon class="duration-icon">schedule</mat-icon>
+                <span>{{ service.duration }}</span>
+              </div>
+              <div class="service-pricing">
+                @if (service.originalPrice) {
+                <span class="original-price">₹{{ service.originalPrice }}</span>
+                }
+                <span class="current-price">₹{{ service.price }}</span>
+              </div>
+            </div>
+          </div>
+          }
+        </div>
+        } @else {
+        <div class="no-services">
+          <mat-icon>search_off</mat-icon>
+          <h3>No services found</h3>
+          <p>Try adjusting your filters or search query</p>
+          <button mat-raised-button (click)="clearFilters()">
+            Clear Filters
+          </button>
+        </div>
+        }
+      </main>
+    </div>
+  </div>
+</div>

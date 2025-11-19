@@ -1,0 +1,427 @@
+<div class="registration-container">
+  <!-- Header -->
+  <header class="registration-header">
+    <div class="logo">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span class="logo-text">UrbanFix</span>
+    </div>
+  </header>
+
+  <!-- Back Button -->
+  <div class="back-button-container">
+    <button mat-button class="back-button" (click)="goBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+
+  <!-- Progress Bar and Stepper -->
+  <div class="progress-section">
+    <div class="progress-header">
+      <span class="step-info"
+        >Step {{ currentStep + 1 }} of {{ totalSteps }}</span
+      >
+      <span class="completion-info">{{ progressPercentage }}% Complete</span>
+    </div>
+    <mat-progress-bar
+      mode="determinate"
+      [value]="progressPercentage"
+    ></mat-progress-bar>
+
+    <div class="step-labels">
+      <div
+        class="step-label"
+        [class.active]="currentStep === 0"
+        [class.completed]="currentStep > 0"
+      >
+        <div class="step-circle">
+          <mat-icon *ngIf="currentStep > 0">check</mat-icon>
+          <span *ngIf="currentStep === 0">1</span>
+        </div>
+        <span class="step-text">Basic Info</span>
+      </div>
+      <div
+        class="step-label"
+        [class.active]="currentStep === 1"
+        [class.completed]="currentStep > 1"
+      >
+        <div class="step-circle">
+          <mat-icon *ngIf="currentStep > 1">check</mat-icon>
+          <span *ngIf="currentStep <= 1">2</span>
+        </div>
+        <span class="step-text">Categories</span>
+      </div>
+      <div
+        class="step-label"
+        [class.active]="currentStep === 2"
+        [class.completed]="currentStep > 2"
+      >
+        <div class="step-circle">
+          <span>3</span>
+        </div>
+        <span class="step-text">Services</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Form Content -->
+  <div class="form-container">
+    <!-- Step 1: Basic Information -->
+    <div class="step-content" *ngIf="currentStep === 0">
+      <div class="form-card">
+        <h2 class="form-title">Create Your Partner Account</h2>
+        <p class="form-subtitle">
+          Let's start with your basic information. All fields are required.
+        </p>
+
+        <form [formGroup]="basicInfoForm">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Full Name</mat-label>
+            <input
+              matInput
+              formControlName="fullName"
+              placeholder="Enter your full name"
+              maxlength="50"
+            />
+            <mat-error
+              *ngIf="basicInfoForm.get('fullName')?.hasError('required')"
+            >
+              Full name is required
+            </mat-error>
+            <mat-error
+              *ngIf="basicInfoForm.get('fullName')?.hasError('maxlength')"
+            >
+              Name cannot exceed 50 characters
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email Address</mat-label>
+            <input
+              matInput
+              formControlName="email"
+              type="email"
+              placeholder="your.email@example.com"
+            />
+            <mat-error *ngIf="basicInfoForm.get('email')?.hasError('required')">
+              Email is required
+            </mat-error>
+            <mat-error *ngIf="basicInfoForm.get('email')?.hasError('email')">
+              Please enter a valid email address
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Phone Number</mat-label>
+            <input
+              matInput
+              formControlName="phoneNumber"
+              placeholder="+91 XXXXX XXXXX"
+              maxlength="10"
+            />
+            <mat-error
+              *ngIf="basicInfoForm.get('phoneNumber')?.hasError('required')"
+            >
+              Phone number is required
+            </mat-error>
+            <mat-error
+              *ngIf="basicInfoForm.get('phoneNumber')?.hasError('pattern')"
+            >
+              Please enter a valid 10-digit phone number
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Password</mat-label>
+            <input
+              matInput
+              formControlName="password"
+              type="password"
+              placeholder="At least 8 characters"
+            />
+            <mat-hint
+              >Must contain uppercase, lowercase, number, and special
+              character</mat-hint
+            >
+            <mat-error
+              *ngIf="basicInfoForm.get('password')?.hasError('required')"
+            >
+              Password is required
+            </mat-error>
+            <mat-error
+              *ngIf="
+                basicInfoForm.get('password')?.hasError('passwordStrength')
+              "
+            >
+              Password must be at least 8 characters with uppercase, lowercase,
+              number, and special character
+            </mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Confirm Password</mat-label>
+            <input
+              matInput
+              formControlName="confirmPassword"
+              type="password"
+              placeholder="Re-enter your password"
+            />
+            <mat-error
+              *ngIf="basicInfoForm.get('confirmPassword')?.hasError('required')"
+            >
+              Please confirm your password
+            </mat-error>
+            <mat-error
+              *ngIf="
+                basicInfoForm.hasError('passwordMismatch') &&
+                basicInfoForm.get('confirmPassword')?.touched
+              "
+            >
+              Passwords do not match
+            </mat-error>
+          </mat-form-field>
+        </form>
+      </div>
+    </div>
+
+    <!-- Step 2: Category Selection -->
+    <div class="step-content" *ngIf="currentStep === 1">
+      <div class="form-card">
+        <h2 class="form-title">Select Your Service Categories</h2>
+        <p class="form-subtitle">
+          Choose all the service categories you can provide. You can add
+          specific services in the next step.
+        </p>
+
+        <form [formGroup]="categoriesForm">
+          <div class="categories-grid">
+            @for (category of categories; track category.id) {
+            <div
+              class="category-card"
+              [class.selected]="selectedCategories.includes(category.id)"
+              (click)="
+                onCategoryChange(
+                  category.id,
+                  !selectedCategories.includes(category.id)
+                )
+              "
+            >
+              <mat-checkbox
+                [checked]="selectedCategories.includes(category.id)"
+                (change)="onCategoryChange(category.id, $event.checked)"
+                (click)="$event.stopPropagation()"
+              >
+              </mat-checkbox>
+              <mat-icon class="category-icon">{{ category.icon }}</mat-icon>
+              <span class="category-name">{{ category.name }}</span>
+            </div>
+            }
+          </div>
+        </form>
+
+        <div class="validation-message" *ngIf="selectedCategories.length === 0">
+          <mat-icon>info</mat-icon>
+          <span>Please select at least one service category</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Step 3: Services -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <div class="form-card">
+        <h2 class="form-title">Add Your Services</h2>
+        <p class="form-subtitle">
+          Define the specific services you offer for each category, including
+          pricing and estimated duration. Each category must have at least one
+          service.
+        </p>
+
+        <div class="services-accordion">
+          @for (categoryId of selectedCategories; track categoryId) {
+          <mat-expansion-panel class="category-panel">
+            <mat-expansion-panel-header>
+              <mat-panel-title>
+                <mat-icon class="category-panel-icon">{{
+                  getCategoryIcon(categoryId)
+                }}</mat-icon>
+                <span class="category-panel-title">{{
+                  getCategoryName(categoryId)
+                }}</span>
+                <span class="service-count"
+                  >{{ categoryServices[categoryId].length || 0 }} service{{
+                    (categoryServices[categoryId].length || 0) === 1 ? "" : "s"
+                  }}</span
+                >
+              </mat-panel-title>
+            </mat-expansion-panel-header>
+
+            <div class="services-list">
+              @for (service of categoryServices[categoryId]; track $index; let i
+              = $index) {
+              <div class="service-item">
+                <div class="service-header">
+                  <span class="service-number">Service {{ i + 1 }}</span>
+                  <button
+                    mat-icon-button
+                    color="warn"
+                    (click)="removeService(categoryId, i)"
+                    *ngIf="categoryServices[categoryId].length > 1"
+                  >
+                    <mat-icon>delete</mat-icon>
+                  </button>
+                </div>
+
+                <div class="service-form">
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Service Title</mat-label>
+                    <input
+                      matInput
+                      [(ngModel)]="service.title"
+                      placeholder="e.g., Bathroom Deep Cleaning"
+                    />
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline" class="full-width">
+                    <mat-label>Description</mat-label>
+                    <textarea
+                      matInput
+                      [(ngModel)]="service.description"
+                      rows="3"
+                      placeholder="Describe what's included in this service"
+                    ></textarea>
+                  </mat-form-field>
+
+                  <div class="form-row">
+                    <mat-form-field
+                      appearance="outline"
+                      class="form-field-third"
+                    >
+                      <mat-label>Pricing Type</mat-label>
+                      <mat-select [(ngModel)]="service.pricingType">
+                        <mat-option value="Hourly Rate">Hourly Rate</mat-option>
+                        <mat-option value="Fixed Price">Fixed Price</mat-option>
+                      </mat-select>
+                    </mat-form-field>
+
+                    <mat-form-field
+                      appearance="outline"
+                      class="form-field-third"
+                    >
+                      <mat-label>Price (₹)</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        [(ngModel)]="service.price"
+                        min="0"
+                      />
+                    </mat-form-field>
+
+                    <mat-form-field
+                      appearance="outline"
+                      class="form-field-third"
+                    >
+                      <mat-label>Duration (minutes)</mat-label>
+                      <input
+                        matInput
+                        type="number"
+                        [(ngModel)]="service.duration"
+                        min="0"
+                      />
+                    </mat-form-field>
+                  </div>
+
+                  <div class="offer-section">
+                    <div class="offer-toggle">
+                      <span class="offer-label">Apply Offer</span>
+                      <mat-slide-toggle
+                        [(ngModel)]="service.applyOffer"
+                        color="primary"
+                      >
+                      </mat-slide-toggle>
+                    </div>
+
+                    <div class="offer-fields" *ngIf="service.applyOffer">
+                      <mat-form-field
+                        appearance="outline"
+                        class="form-field-half"
+                      >
+                        <mat-label>Offer Title</mat-label>
+                        <input
+                          matInput
+                          [(ngModel)]="service.offerTitle"
+                          placeholder="e.g., Summer Special, Limited Time Offer"
+                        />
+                      </mat-form-field>
+
+                      <mat-form-field
+                        appearance="outline"
+                        class="form-field-half"
+                      >
+                        <mat-label>Discount Percentage (%)</mat-label>
+                        <input
+                          matInput
+                          type="number"
+                          [(ngModel)]="service.discountPercentage"
+                          min="0"
+                          max="100"
+                        />
+                      </mat-form-field>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              }
+
+              <button
+                mat-stroked-button
+                class="add-service-btn"
+                (click)="addService(categoryId)"
+              >
+                <mat-icon>add</mat-icon>
+                Add Service to {{ getCategoryName(categoryId) }}
+              </button>
+            </div>
+          </mat-expansion-panel>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Navigation Buttons -->
+    <div class="navigation-buttons">
+      <button
+        mat-button
+        class="nav-btn"
+        (click)="previousStep()"
+        [disabled]="currentStep === 0"
+      >
+        <mat-icon>arrow_back</mat-icon>
+        Previous
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="nav-btn"
+        *ngIf="currentStep < totalSteps - 1"
+        (click)="nextStep()"
+        [disabled]="!canGoNext()"
+      >
+        Next Step
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+
+      <button
+        mat-raised-button
+        color="primary"
+        class="nav-btn submit-btn"
+        *ngIf="currentStep === totalSteps - 1"
+        (click)="submitRegistration()"
+        [disabled]="!canSubmit()"
+      >
+        Submit Registration
+        <mat-icon>check</mat-icon>
+      </button>
+    </div>
+  </div>
+</div>

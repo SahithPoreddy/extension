@@ -1,0 +1,223 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="logo">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span class="logo-text">UrbanFix</span>
+    </div>
+    <div class="header-actions">
+      <button mat-button class="login-btn" (click)="navigateToLogin()">
+        Login
+      </button>
+      <button mat-raised-button class="signup-btn" (click)="navigateToSignup()">
+        Sign Up
+      </button>
+    </div>
+  </div>
+</header>
+
+<!-- Hero Section with Carousel -->
+<section class="hero-section">
+  <div class="carousel-container">
+    @for (image of carouselImages; track image.url; let i = $index) {
+    <div class="carousel-slide" [class.active]="i === currentImageIndex">
+      <img [src]="image.url" [alt]="image.alt" />
+      <div class="carousel-overlay"></div>
+    </div>
+    }
+
+    <!-- Hero Content -->
+    <div class="hero-content">
+      <h1 class="hero-title">Home Services at Your Doorstep</h1>
+      <p class="hero-subtitle">
+        Book trusted professionals for cleaning, repairs, and more
+      </p>
+
+      <!-- Search Bar -->
+      <div class="search-container">
+        <div class="location-input">
+          <mat-icon>location_on</mat-icon>
+          <input type="text" placeholder="Mumbai, Maharashtra" />
+        </div>
+        <div class="search-input">
+          <mat-icon>search</mat-icon>
+          <input
+            type="text"
+            placeholder="Search for services (e.g., AC repair, house cleaning)"
+          />
+        </div>
+      </div>
+
+      <!-- Testimonial Cards Floating -->
+      <div class="floating-testimonial left">
+        <div class="stars">
+          @for (star of getStarsArray(5); track $index) {
+          <mat-icon class="star">star</mat-icon>
+          }
+        </div>
+        <p class="testimonial-text">
+          Quick and professional plumbing service. Fixed the leak fast!
+        </p>
+        <span class="testimonial-author">- Pradeep</span>
+      </div>
+
+      <div class="floating-testimonial right">
+        <div class="stars">
+          @for (star of getStarsArray(5); track $index) {
+          <mat-icon class="star">star</mat-icon>
+          }
+        </div>
+        <p class="testimonial-text">
+          Amazing deep cleaning service! My house has never looked better.
+        </p>
+        <span class="testimonial-author">- Ankita</span>
+      </div>
+    </div>
+
+    <!-- Carousel Indicators -->
+    <div class="carousel-indicators">
+      @for (image of carouselImages; track $index; let i = $index) {
+      <button
+        class="indicator"
+        [class.active]="i === currentImageIndex"
+        (click)="goToImage(i)"
+      ></button>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Popular Services Section -->
+<section class="popular-services">
+  <div class="container">
+    <h2 class="section-title">Popular Services</h2>
+    <div class="services-grid">
+      @for (service of popularServices; track service.id) {
+      <div class="service-card" (click)="selectService(service)">
+        <div class="service-icon">
+          <mat-icon>{{ service.icon }}</mat-icon>
+        </div>
+        <h3 class="service-name">{{ service.name }}</h3>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Why Choose UrbanFix Section -->
+<section class="why-choose">
+  <div class="container">
+    <h2 class="section-title">Why Choose UrbanFix?</h2>
+    <div class="features-grid">
+      @for (feature of features; track feature.title) {
+      <div class="feature-card">
+        <div class="feature-icon">
+          <mat-icon>{{ feature.icon }}</mat-icon>
+        </div>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works">
+  <div class="container">
+    <h2 class="section-title">How It Works</h2>
+    <div class="steps-grid">
+      @for (step of steps; track step.number) {
+      <div class="step-card">
+        <div class="step-number">{{ step.number }}</div>
+        <h3 class="step-title">{{ step.title }}</h3>
+        <p class="step-description">{{ step.description }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Customer Testimonials Section -->
+<section class="testimonials">
+  <div class="container">
+    <h2 class="section-title">What Our Customers Say</h2>
+    <div class="testimonials-grid">
+      @for (testimonial of testimonials; track testimonial.id) {
+      <div class="testimonial-card">
+        <div class="testimonial-stars">
+          @for (star of getStarsArray(testimonial.rating); track $index) {
+          <mat-icon class="star">star</mat-icon>
+          }
+        </div>
+        <p class="testimonial-text">{{ testimonial.text }}</p>
+        <p class="testimonial-author">- {{ testimonial.customerName }}</p>
+      </div>
+      }
+    </div>
+  </div>
+</section>
+
+<!-- Call to Action Section -->
+<section class="cta-section">
+  <div class="container">
+    <h2 class="cta-title">Ready to Get Started?</h2>
+    <p class="cta-subtitle">
+      Join thousands of happy customers who trust UrbanFix
+    </p>
+    <button mat-raised-button class="cta-btn" (click)="navigateToSignup()">
+      Sign Up Now
+      <mat-icon>arrow_forward</mat-icon>
+    </button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-content">
+    <div class="footer-section">
+      <div class="footer-logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix</span>
+      </div>
+      <p class="footer-tagline">Your trusted home services platform</p>
+    </div>
+
+    <div class="footer-section">
+      <h4 class="footer-title">Services</h4>
+      <ul class="footer-links">
+        <li><a href="#">Cleaning</a></li>
+        <li><a href="#">Plumbing</a></li>
+        <li><a href="#">Electrical</a></li>
+        <li><a href="#">Painting</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h4 class="footer-title">Company</h4>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Careers</a></li>
+        <li>
+          <a (click)="navigateToPartner()" style="cursor: pointer"
+            >Become a Partner</a
+          >
+        </li>
+      </ul>
+    </div>
+
+    <div class="footer-section">
+      <h4 class="footer-title">Legal</h4>
+      <ul class="footer-links">
+        <li><a href="#">Terms of Service</a></li>
+        <li><a href="#">Privacy Policy</a></li>
+        <li><a href="#">Refund Policy</a></li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 UrbanFix. All rights reserved.</p>
+  </div>
+</footer>

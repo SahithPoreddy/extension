@@ -1,0 +1,629 @@
+{
+  "users": [
+    {
+      "id": "001",
+      "userName": "John Doe",
+      "name": "John Doe",
+      "phoneNumber": 1234567890,
+      "phone": "+91 1234567890",
+      "role": "partner",
+      "email": "jhn.doe@gmail.com",
+      "password": "Partner@123",
+      "bio": "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...",
+      "profilePicture": "",
+      "profileCompleted": false,
+      "address": {
+        "street": "#202, 1st Main",
+        "city": "Bangalore",
+        "state": "Karnataka",
+        "pincode": "560088"
+      },
+      "addresses": [
+        {
+          "tag": "",
+          "street": "#202, 1st Main",
+          "city": "Bangalore",
+          "state": "Karnataka",
+          "pincode": 560088
+        }
+      ],
+      "bankAccount": {
+        "accountHolder": "John Doe",
+        "accountNumber": "1234567",
+        "ifsc": "SBI00111",
+        "bankName": "State Bank Of India"
+      },
+      "serviceAreas": ["560088", "560077", "560044"],
+      "services": {
+        "cleaning": [
+          {
+            "title": "Bathroom Deep Cleaning",
+            "description": "Complete bathroom sanitization including tiles, fixtures, and drainage",
+            "pricingType": "Fixed Price",
+            "price": 899,
+            "duration": 90,
+            "applyOffer": true,
+            "offerTitle": "Summer Special",
+            "discountPercentage": 20,
+            "isActive": true
+          },
+          {
+            "title": "Kitchen Cleaning",
+            "description": "Comprehensive kitchen cleaning including tiles, fixtures, and drainage",
+            "pricingType": "Fixed Price",
+            "price": 1299,
+            "duration": 120,
+            "applyOffer": false,
+            "offerTitle": "",
+            "discountPercentage": 0,
+            "isActive": true
+          }
+        ]
+      },
+      "portfolio": [
+        {
+          "id": "portfolio-1",
+          "imageUrl": "https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800",
+          "caption": "Bathroom deep cleaning - Before and After",
+          "uploadedDate": "2025-01-15"
+        },
+        {
+          "id": "portfolio-2",
+          "imageUrl": "https://images.unsplash.com/photo-1556911220-bff31c812dba?w=800",
+          "caption": "Kitchen renovation completed",
+          "uploadedDate": "2025-01-14"
+        },
+        {
+          "id": "portfolio-3",
+          "imageUrl": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=800",
+          "caption": "Living room interior painting",
+          "uploadedDate": "2025-01-13"
+        },
+        {
+          "id": "portfolio-4",
+          "imageUrl": "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=800",
+          "caption": "No caption",
+          "uploadedDate": "2025-01-10"
+        }
+      ]
+    },
+    {
+      "id": "002",
+      "userName": "Dan",
+      "phoneNumber": 1234567888,
+      "role": "user",
+      "email": "dan@gmail.com",
+      "password": "User@123",
+      "bio": "Lorem Ipsum has been the industry's standard dummy text ever since the 1500s...",
+      "addresses": [
+        {
+          "tag": "Home",
+          "street": "#202, 1st Main",
+          "city": "Bangalore",
+          "state": "Karnataka",
+          "pincode": 560088
+        },
+        {
+          "tag": "Office",
+          "street": "#201, 2nd Main",
+          "city": "Bangalore",
+          "state": "Karnataka",
+          "pincode": 560099
+        }
+      ]
+    },
+    {
+      "id": "ee35",
+      "fullName": "Sahith Chandra",
+      "email": "sahith12poreddy@gmail.com",
+      "phoneNumber": "9999999999",
+      "password": "Sahith@12",
+      "categories": ["plumbing", "cleaning"],
+      "services": {
+        "plumbing": [
+          {
+            "title": "Water leak fixes",
+            "description": "We fill in all the holes",
+            "pricingType": "Fixed Price",
+            "price": 1000,
+            "duration": 60,
+            "applyOffer": false,
+            "offerTitle": "",
+            "discountPercentage": 0,
+            "isActive": true
+          }
+        ],
+        "cleaning": [
+          {
+            "title": "Deep cleaning",
+            "description": "We clean all your shit",
+            "pricingType": "Hourly Rate",
+            "price": 300,
+            "duration": 60,
+            "applyOffer": false,
+            "offerTitle": "",
+            "discountPercentage": 0,
+            "isActive": true
+          }
+        ]
+      },
+      "sessionId": "73646c92-31d3-4f03-9ca7-05a2a91ec364",
+      "role": "partner",
+      "createdAt": "2025-11-18T16:55:45.646Z",
+      "portfolio": [
+        {
+          "id": "portfolio-1763491295132",
+          "imageUrl": "data:image/jpeg;base64,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",
+          "caption": "kjhk",
+          "uploadedDate": "2025-11-18"
+        }
+      ]
+    }
+  ],
+  "categories": [
+    {
+      "id": "001",
+      "name": "Electrical",
+      "icon": "electrical"
+    },
+    {
+      "id": "002",
+      "name": "Plumbing",
+      "icon": "plumbing"
+    },
+    {
+      "id": "003",
+      "name": "Carpentry",
+      "icon": "carpentry"
+    }
+  ],
+  "services": [
+    {
+      "id": "001",
+      "partnerId": "001",
+      "title": "Electrical work during construction",
+      "categoryId": "001",
+      "priceType": "daily",
+      "price": 5000,
+      "duration": 10,
+      "hasOffer": true,
+      "offerTitle": "Deepavali Offer",
+      "offerDiscount": 20,
+      "active": true,
+      "ratings": [
+        {
+          "userId": "002",
+          "rating": 2,
+          "comment": "Lorem Ipsum is simply dummy text of the printing and typesetting industry."
+        }
+      ]
+    },
+    {
+      "id": "002",
+      "partnerId": "001",
+      "title": "Quick Fix Electrical Work",
+      "categoryId": "001",
+      "priceType": "hourly",
+      "price": 500,
+      "duration": 60,
+      "hasOffer": true,
+      "offerTitle": "Deepavali Offer",
+      "offerDiscount": 20,
+      "active": true,
+      "ratings": []
+    },
+    {
+      "id": "003",
+      "partnerId": "001",
+      "title": "Plumbing Leak Repair",
+      "categoryId": "002",
+      "priceType": "hourly",
+      "price": 700,
+      "duration": 75,
+      "hasOffer": false,
+      "offerTitle": "",
+      "offerDiscount": 0,
+      "active": true,
+      "ratings": []
+    },
+    {
+      "id": "004",
+      "partnerId": "001",
+      "title": "Custom Bookshelf Installation",
+      "categoryId": "003",
+      "priceType": "fixed",
+      "price": 4000,
+      "duration": 180,
+      "hasOffer": true,
+      "offerTitle": "Monsoon Discount",
+      "offerDiscount": 10,
+      "active": true,
+      "ratings": []
+    },
+    {
+      "id": "005",
+      "partnerId": "001",
+      "title": "Ceiling Fan Installation",
+      "categoryId": "001",
+      "priceType": "per item",
+      "price": 350,
+      "duration": 30,
+      "hasOffer": false,
+      "offerTitle": "",
+      "offerDiscount": 0,
+      "active": true,
+      "ratings": []
+    }
+  ],
+  "bookings": [
+    {
+      "id": "BK001",
+      "partnerId": "001",
+      "customerName": "Priya Sharma",
+      "serviceName": "Bathroom Deep Cleaning",
+      "serviceType": "Cleaning",
+      "bookingDate": "2025-01-26",
+      "bookingTime": "10:00 AM",
+      "address": "123, Park Street, Andheri West, Mumbai - 400058",
+      "phoneNumber": "+91 98765 43210",
+      "status": "Pending",
+      "price": 899,
+      "specialInstructions": "Please bring extra cleaning supplies"
+    },
+    {
+      "id": "BK002",
+      "partnerId": "001",
+      "customerName": "Rahul Mehta",
+      "serviceName": "Kitchen Cleaning",
+      "serviceType": "Cleaning",
+      "bookingDate": "2025-01-23",
+      "bookingTime": "2:00 PM",
+      "address": "456, Main Road, Bandra, Mumbai - 400050",
+      "phoneNumber": "+91 98764 32109",
+      "status": "Confirmed",
+      "price": 1299,
+      "specialInstructions": "Comprehensive kitchen cleaning including tiles, fixtures, and drainage"
+    },
+    {
+      "id": "BK003",
+      "partnerId": "001",
+      "customerName": "Anjali Patel",
+      "serviceName": "Full House Cleaning",
+      "serviceType": "Cleaning",
+      "bookingDate": "2025-01-24",
+      "bookingTime": "11:00 AM",
+      "address": "789, Hill View, Powai, Mumbai - 400076",
+      "phoneNumber": "+91 78543 21098",
+      "status": "Confirmed",
+      "price": 2499
+    },
+    {
+      "id": "BK004",
+      "partnerId": "001",
+      "customerName": "Vikram Singh",
+      "serviceName": "Bathroom Deep Cleaning",
+      "serviceType": "Cleaning",
+      "bookingDate": "2025-01-16",
+      "bookingTime": "9:30 AM",
+      "address": "321, Lake Side, Goregaon, Mumbai - 400063",
+      "phoneNumber": "+91 85432 10987",
+      "status": "Completed",
+      "price": 899
+    },
+    {
+      "id": "BK005",
+      "partnerId": "001",
+      "customerName": "Neha Gupta",
+      "serviceName": "Kitchen Cleaning",
+      "serviceType": "Cleaning",
+      "bookingDate": "2025-01-15",
+      "bookingTime": "3:20 PM",
+      "address": "654, Garden View, Malad, Mumbai - 400064",
+      "phoneNumber": "+91 94321 10876",
+      "status": "Canceled",
+      "price": 1299,
+      "specialInstructions": "Cancelled due to emergency"
+    }
+  ],
+  "portfolio": [
+    {
+      "id": "001",
+      "partnerId": "001",
+      "imageUrl": "/path/to/image",
+      "caption": "Lorem Ipsum"
+    }
+  ],
+  "earnings": [
+    {
+      "id": "1",
+      "partnerId": "001",
+      "totalEarnings": 45000,
+      "availableBalance": 12450,
+      "pendingPayment": 2198,
+      "lastPayout": 5000
+    }
+  ],
+  "transactions": [
+    {
+      "id": "TXN001",
+      "partnerId": "001",
+      "type": "earning",
+      "title": "Bathroom Deep Cleaning",
+      "from": "Vikram Singh",
+      "amount": 899,
+      "date": "2025-01-16",
+      "status": "Completed"
+    },
+    {
+      "id": "TXN002",
+      "partnerId": "001",
+      "type": "payout",
+      "title": "Payout to Bank Account",
+      "amount": 5000,
+      "date": "2025-01-15",
+      "status": "Success"
+    },
+    {
+      "id": "TXN003",
+      "partnerId": "001",
+      "type": "earning",
+      "title": "Kitchen Cleaning",
+      "from": "Priya Sharma",
+      "amount": 1299,
+      "date": "2025-01-14",
+      "status": "Completed"
+    },
+    {
+      "id": "TXN004",
+      "partnerId": "001",
+      "type": "earning",
+      "title": "Full House Cleaning",
+      "from": "Anjali Patel",
+      "amount": 2499,
+      "date": "2025-01-13",
+      "status": "Completed"
+    },
+    {
+      "id": "TXN005",
+      "partnerId": "001",
+      "type": "payout",
+      "title": "Payout to Bank Account",
+      "amount": 3000,
+      "date": "2025-01-10",
+      "status": "Success"
+    },
+    {
+      "id": "TXN006",
+      "partnerId": "001",
+      "type": "earning",
+      "title": "Bathroom Deep Cleaning",
+      "from": "Rahul Mehta",
+      "amount": 899,
+      "date": "2025-01-09",
+      "status": "Completed"
+    },
+    {
+      "id": "TXN007",
+      "partnerId": "001",
+      "type": "earning",
+      "title": "Kitchen Cleaning",
+      "from": "Neha Gupta",
+      "amount": 1299,
+      "date": "2025-01-08",
+      "status": "Pending"
+    }
+  ],
+  "reviews": [
+    {
+      "id": "REV001",
+      "partnerId": "001",
+      "customerId": "002",
+      "customerName": "Priya Sharma",
+      "customerInitials": "PS",
+      "serviceId": "SRV001",
+      "serviceName": "Bathroom Deep Cleaning",
+      "rating": 5,
+      "comment": "Excellent service! Very thorough and professional. The bathroom looks brand new. Highly recommend!",
+      "date": "2024-12-20",
+      "partnerResponse": "",
+      "responseDate": ""
+    },
+    {
+      "id": "REV002",
+      "partnerId": "001",
+      "customerId": "003",
+      "customerName": "Rahul Mehta",
+      "customerInitials": "RM",
+      "serviceId": "SRV002",
+      "serviceName": "Kitchen Cleaning",
+      "rating": 5,
+      "comment": "Great work! Arrived on time and completed the job efficiently. Very satisfied with the results.",
+      "date": "2024-10-10",
+      "partnerResponse": "Thank you so much for your kind words! It was a pleasure working with you.",
+      "responseDate": "2024-10-11"
+    },
+    {
+      "id": "REV003",
+      "partnerId": "001",
+      "customerId": "004",
+      "customerName": "Anjali Patel",
+      "customerInitials": "AP",
+      "serviceId": "SRV003",
+      "serviceName": "Full House Cleaning",
+      "rating": 4,
+      "comment": "Good service overall. Did a thorough job but took a bit longer than expected.",
+      "date": "2024-12-15",
+      "partnerResponse": "",
+      "responseDate": ""
+    },
+    {
+      "id": "REV004",
+      "partnerId": "001",
+      "customerId": "005",
+      "customerName": "Vikram Singh",
+      "customerInitials": "VS",
+      "serviceId": "SRV001",
+      "serviceName": "Bathroom Deep Cleaning",
+      "rating": 5,
+      "comment": "Outstanding! Very detail-oriented and left everything spotless. Will definitely book again.",
+      "date": "2024-12-02",
+      "partnerResponse": "I really appreciate your feedback! Looking forward to serving you again.",
+      "responseDate": "2024-12-03"
+    },
+    {
+      "id": "REV005",
+      "partnerId": "001",
+      "customerId": "006",
+      "customerName": "Neha Gupta",
+      "customerInitials": "NG",
+      "serviceId": "SRV002",
+      "serviceName": "Kitchen Cleaning",
+      "rating": 3,
+      "comment": "Decent work but missed a few spots. Had to point them out for a re-clean.",
+      "date": "2024-12-25",
+      "partnerResponse": "",
+      "responseDate": ""
+    },
+    {
+      "id": "REV006",
+      "partnerId": "001",
+      "customerId": "007",
+      "customerName": "Amit Verma",
+      "customerInitials": "AV",
+      "serviceId": "SRV001",
+      "serviceName": "Bathroom Deep Cleaning",
+      "rating": 4,
+      "comment": "Good job! Professional service and reasonable pricing.",
+      "date": "2024-12-18",
+      "partnerResponse": "",
+      "responseDate": ""
+    }
+  ],
+  "notifications": [
+    {
+      "id": "NOT001",
+      "partnerId": "001",
+      "type": "booking",
+      "title": "New Booking Request",
+      "message": "Priya Sharma requested Bathroom Deep Cleaning for Jan 25, 10:30 AM",
+      "timestamp": "2025-01-20T09:15:00",
+      "isRead": false,
+      "icon": "event_note",
+      "iconColor": "#2196f3",
+      "actionRoute": "/partner/bookings",
+      "actionId": "BK001"
+    },
+    {
+      "id": "NOT002",
+      "partnerId": "001",
+      "type": "payment",
+      "title": "Payment Received",
+      "message": "₹1,299 has been credited to your account for Kitchen Cleaning service",
+      "timestamp": "2025-01-19T14:30:00",
+      "isRead": false,
+      "icon": "account_balance_wallet",
+      "iconColor": "#4caf50",
+      "actionRoute": "/partner/earnings"
+    },
+    {
+      "id": "NOT003",
+      "partnerId": "001",
+      "type": "review",
+      "title": "New Review Received",
+      "message": "Rahul Mehta rated you 5 stars for Kitchen Cleaning",
+      "timestamp": "2025-01-19T10:45:00",
+      "isRead": false,
+      "icon": "star",
+      "iconColor": "#ffc107",
+      "actionRoute": "/partner/reviews"
+    },
+    {
+      "id": "NOT004",
+      "partnerId": "001",
+      "type": "booking",
+      "title": "Booking Confirmed",
+      "message": "Your booking with Anjali Patel for Jan 24, 11:00 AM has been confirmed",
+      "timestamp": "2025-01-19T08:00:00",
+      "isRead": true,
+      "icon": "event_note",
+      "iconColor": "#2196f3",
+      "actionRoute": "/partner/bookings",
+      "actionId": "BK003"
+    },
+    {
+      "id": "NOT005",
+      "partnerId": "001",
+      "type": "payment",
+      "title": "Payout Processed",
+      "message": "₹5,000 has been transferred to your bank account ending in 1234",
+      "timestamp": "2025-01-18T16:20:00",
+      "isRead": true,
+      "icon": "account_balance",
+      "iconColor": "#4caf50",
+      "actionRoute": "/partner/earnings"
+    },
+    {
+      "id": "NOT006",
+      "partnerId": "001",
+      "type": "system",
+      "title": "Profile Update Required",
+      "message": "Please update your service areas to receive more booking requests",
+      "timestamp": "2025-01-18T12:00:00",
+      "isRead": true,
+      "icon": "info",
+      "iconColor": "#9e9e9e",
+      "actionRoute": "/partner/profile"
+    },
+    {
+      "id": "NOT007",
+      "partnerId": "001",
+      "type": "message",
+      "title": "New Message",
+      "message": "Vikram Singh sent you a message about the upcoming booking",
+      "timestamp": "2025-01-17T18:30:00",
+      "isRead": true,
+      "icon": "message",
+      "iconColor": "#9c27b0",
+      "actionRoute": "/partner/bookings"
+    },
+    {
+      "id": "NOT008",
+      "partnerId": "001",
+      "type": "booking",
+      "title": "Booking Cancelled",
+      "message": "Neha Gupta has cancelled the booking scheduled for Jan 15",
+      "timestamp": "2025-01-17T09:15:00",
+      "isRead": true,
+      "icon": "event_busy",
+      "iconColor": "#f44336",
+      "actionRoute": "/partner/bookings",
+      "actionId": "BK005"
+    }
+  ],
+  "addresses": [
+    {
+      "id": "1",
+      "userId": "002",
+      "type": "Home",
+      "addressLine1": "123 Main St",
+      "addressLine2": "Bandra West",
+      "landmark": "Near Metro Station",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400001",
+      "isDefault": true
+    },
+    {
+      "id": "2",
+      "userId": "002",
+      "type": "Office",
+      "addressLine1": "456 Business Park",
+      "addressLine2": "Andheri East",
+      "landmark": "Opposite City Mall",
+      "city": "Mumbai",
+      "state": "Maharashtra",
+      "pincode": "400020",
+      "isDefault": false
+    }
+  ]
+}

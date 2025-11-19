@@ -1,0 +1,107 @@
+<div class="login-container">
+  <!-- Header -->
+  <header class="login-header">
+    <div class="logo">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span class="logo-text">UrbanFix</span>
+    </div>
+  </header>
+
+  <!-- Login Card -->
+  <div class="login-content">
+    <div class="login-card">
+      <h1 class="login-title">Welcome Back</h1>
+      <p class="login-subtitle">Sign in to your partner account</p>
+
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <!-- Email Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Email Address</mat-label>
+          <input
+            matInput
+            formControlName="email"
+            type="email"
+            placeholder="Enter your email"
+          />
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            Email is required
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Please enter a valid email address
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Password Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Password</mat-label>
+          <input
+            matInput
+            formControlName="password"
+            [type]="hidePassword ? 'password' : 'text'"
+            placeholder="Enter your password"
+          />
+          <mat-icon matPrefix>lock</mat-icon>
+          <button
+            mat-icon-button
+            matSuffix
+            type="button"
+            (click)="togglePasswordVisibility()"
+            [attr.aria-label]="'Hide password'"
+            [attr.aria-pressed]="hidePassword"
+          >
+            <mat-icon>{{
+              hidePassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+          <mat-error *ngIf="loginForm.get('password')?.hasError('required')">
+            Password is required
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Error Message -->
+        <div class="error-message" *ngIf="errorMessage">
+          <mat-icon>error</mat-icon>
+          <span>{{ errorMessage }}</span>
+        </div>
+
+        <!-- Forgot Password Link -->
+        <div class="forgot-password">
+          <a href="#" class="forgot-link">Forgot Password?</a>
+        </div>
+
+        <!-- Sign In Button -->
+        <button
+          mat-raised-button
+          color="primary"
+          type="submit"
+          class="sign-in-btn"
+          [disabled]="isLoading"
+        >
+          {{ isLoading ? "Signing In..." : "Sign In" }}
+        </button>
+      </form>
+
+      <!-- Register Link -->
+      <div class="register-section">
+        <p class="register-text">Don't have an account?</p>
+        <button
+          mat-stroked-button
+          class="register-btn"
+          (click)="navigateToRegister()"
+        >
+          Register as a Partner
+        </button>
+      </div>
+    </div>
+
+    <!-- Footer Links -->
+    <div class="login-footer">
+      <p>
+        By signing in, you agree to our
+        <a href="#" class="footer-link">Terms of Service</a> and
+        <a href="#" class="footer-link">Privacy Policy</a>
+      </p>
+    </div>
+  </div>
+</div>

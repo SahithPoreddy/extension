@@ -1,0 +1,134 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <button mat-icon-button class="logo-button" (click)="navigateToDashboard()">
+      <div class="logo">UF</div>
+    </button>
+  </div>
+</header>
+
+@if (isLoading) {
+<div class="loading-container">
+  <p>Loading booking details...</p>
+</div>
+} @else if (booking) {
+<div class="confirmation-container">
+  <!-- Success Icon -->
+  <div class="success-section">
+    <div class="success-icon">
+      <mat-icon>check_circle</mat-icon>
+    </div>
+    <h1 class="confirmation-title">Booking Confirmed!</h1>
+    <p class="confirmation-subtitle">
+      Your service has been successfully booked
+    </p>
+  </div>
+
+  <!-- Booking Details Card -->
+  <div class="details-card">
+    <div class="card-header">
+      <h2 class="card-title">Booking Details</h2>
+      <div class="booking-id">ID: {{ booking.id }}</div>
+    </div>
+
+    <div class="details-grid">
+      <!-- Service Info -->
+      <div class="detail-section">
+        <div class="section-label">Service</div>
+        <div class="section-value">{{ booking.serviceName }}</div>
+      </div>
+
+      <!-- Date & Time -->
+      <div class="detail-section">
+        <div class="section-label">Date & Time</div>
+        <div class="section-value">
+          {{ getFormattedDate() }} at {{ booking.time }}
+        </div>
+      </div>
+
+      <!-- Duration -->
+      <div class="detail-section">
+        <div class="section-label">Duration</div>
+        <div class="section-value">{{ booking.duration }}</div>
+      </div>
+
+      <!-- Amount Paid -->
+      <div class="detail-section">
+        <div class="section-label">Amount Paid</div>
+        <div class="section-value amount">₹{{ booking.amount }}</div>
+      </div>
+
+      <!-- Payment Method -->
+      <div class="detail-section">
+        <div class="section-label">Payment Method</div>
+        <div class="section-value">{{ booking.paymentMethod }}</div>
+      </div>
+
+      <!-- Status -->
+      <div class="detail-section">
+        <div class="section-label">Status</div>
+        <div class="section-value">
+          <span class="status-badge">{{ booking.status }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Service Address -->
+    <div class="address-section">
+      <div class="section-label">Service Address</div>
+      <div class="address-content">
+        <mat-icon class="address-icon">location_on</mat-icon>
+        <div class="address-text">
+          <div class="address-type">{{ booking.address.type }}</div>
+          <p class="address-line">
+            {{ booking.address.addressLine1 }}, {{ booking.address.city }},
+            {{ booking.address.state }} {{ booking.address.pincode }}
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="action-buttons">
+    <button
+      mat-raised-button
+      class="primary-button"
+      (click)="navigateToDashboard()"
+    >
+      <mat-icon>home</mat-icon>
+      Back to Home
+    </button>
+    <button
+      mat-stroked-button
+      class="secondary-button"
+      (click)="navigateToBookings()"
+    >
+      <mat-icon>event</mat-icon>
+      View My Bookings
+    </button>
+  </div>
+
+  <!-- Additional Info -->
+  <div class="info-card">
+    <mat-icon class="info-icon">info</mat-icon>
+    <div class="info-content">
+      <p class="info-title">What's Next?</p>
+      <ul class="info-list">
+        <li>
+          Our service professional will contact you before the scheduled time
+        </li>
+        <li>You will receive updates via notifications</li>
+        <li>You can reschedule or cancel the booking from "My Bookings"</li>
+      </ul>
+    </div>
+  </div>
+</div>
+} @else {
+<div class="error-container">
+  <p>Booking not found</p>
+  <button mat-raised-button (click)="navigateToDashboard()">
+    Back to Home
+  </button>
+</div>
+}

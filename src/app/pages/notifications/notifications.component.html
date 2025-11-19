@@ -1,0 +1,210 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Notifications</h1>
+        <p class="page-subtitle">
+          You have {{ unreadCount }} unread notifications
+        </p>
+      </div>
+      <div class="header-right">
+        <button
+          mat-stroked-button
+          (click)="markAllAsRead()"
+          class="mark-read-btn"
+          [disabled]="unreadCount === 0"
+        >
+          <mat-icon>done_all</mat-icon>
+          Mark All as Read
+        </button>
+        <span class="welcome-text">Welcome, {{ userName }}</span>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('/partner/profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Notifications Content -->
+    <div class="notifications-content">
+      <!-- Tabs -->
+      <mat-tab-group class="notifications-tabs" animationDuration="300ms">
+        <!-- All Notifications Tab -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label"
+              >All Notifications ({{ allNotifications.length }})</span
+            >
+          </ng-template>
+
+          <div class="notifications-list">
+            <h3 class="section-title">All Notifications</h3>
+
+            @if (allNotifications.length === 0) {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">notifications_none</mat-icon>
+              <p>No notifications yet</p>
+              <span class="empty-subtitle"
+                >You'll see updates about bookings, payments, and reviews
+                here</span
+              >
+            </div>
+            } @else { @for (notification of allNotifications; track
+            notification.id) {
+            <div
+              class="notification-card"
+              [class.unread]="!notification.isRead"
+              (click)="handleNotificationClick(notification)"
+            >
+              <div
+                class="notification-icon"
+                [style.background-color]="notification.iconColor"
+              >
+                <mat-icon>{{ notification.icon }}</mat-icon>
+              </div>
+              <div class="notification-content">
+                <h4 class="notification-title">{{ notification.title }}</h4>
+                <p class="notification-message">{{ notification.message }}</p>
+                <div class="notification-footer">
+                  <span class="notification-time">{{
+                    getTimeAgo(notification.timestamp)
+                  }}</span>
+                  @if (!notification.isRead) {
+                  <span class="new-badge">New</span>
+                  }
+                </div>
+              </div>
+              @if (!notification.isRead) {
+              <div class="unread-indicator"></div>
+              }
+            </div>
+            } }
+          </div>
+        </mat-tab>
+
+        <!-- Unread Tab -->
+        <mat-tab>
+          <ng-template mat-tab-label>
+            <span class="tab-label">Unread ({{ unreadCount }})</span>
+          </ng-template>
+
+          <div class="notifications-list">
+            <h3 class="section-title">Unread Notifications</h3>
+
+            @if (unreadNotifications.length === 0) {
+            <div class="empty-state">
+              <mat-icon class="empty-icon">done_all</mat-icon>
+              <p>All caught up!</p>
+              <span class="empty-subtitle"
+                >You have no unread notifications</span
+              >
+            </div>
+            } @else { @for (notification of unreadNotifications; track
+            notification.id) {
+            <div
+              class="notification-card unread"
+              (click)="handleNotificationClick(notification)"
+            >
+              <div
+                class="notification-icon"
+                [style.background-color]="notification.iconColor"
+              >
+                <mat-icon>{{ notification.icon }}</mat-icon>
+              </div>
+              <div class="notification-content">
+                <h4 class="notification-title">{{ notification.title }}</h4>
+                <p class="notification-message">{{ notification.message }}</p>
+                <div class="notification-footer">
+                  <span class="notification-time">{{
+                    getTimeAgo(notification.timestamp)
+                  }}</span>
+                  <span class="new-badge">New</span>
+                </div>
+              </div>
+              <div class="unread-indicator"></div>
+            </div>
+            } }
+          </div>
+        </mat-tab>
+      </mat-tab-group>
+
+      <!-- Notification Types Legend -->
+      <div class="notification-types">
+        <h3 class="types-title">Notification Types</h3>
+        <div class="types-grid">
+          <div class="type-item">
+            <div class="type-icon booking-icon">
+              <mat-icon>event_note</mat-icon>
+            </div>
+            <span class="type-label">Booking Updates</span>
+          </div>
+          <div class="type-item">
+            <div class="type-icon payment-icon">
+              <mat-icon>account_balance_wallet</mat-icon>
+            </div>
+            <span class="type-label">Payments & Payouts</span>
+          </div>
+          <div class="type-item">
+            <div class="type-icon review-icon">
+              <mat-icon>star</mat-icon>
+            </div>
+            <span class="type-label">Reviews & Ratings</span>
+          </div>
+          <div class="type-item">
+            <div class="type-icon message-icon">
+              <mat-icon>message</mat-icon>
+            </div>
+            <span class="type-label">Messages</span>
+          </div>
+          <div class="type-item">
+            <div class="type-icon system-icon">
+              <mat-icon>info</mat-icon>
+            </div>
+            <span class="type-label">System Updates</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

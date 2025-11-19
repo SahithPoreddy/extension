@@ -1,0 +1,171 @@
+<div class="profile-container">
+  <!-- Header -->
+  <header class="header">
+    <div class="header-content">
+      <!-- Logo -->
+      <div class="logo" (click)="navigateToDashboard()">
+        <div class="logo-square">
+          <span>UF</span>
+        </div>
+        <span class="logo-text">UrbanFix</span>
+      </div>
+
+      <!-- Header Actions -->
+      <div class="header-actions">
+        <button class="icon-button">
+          <mat-icon>notifications</mat-icon>
+        </button>
+        <button class="profile-button">
+          <mat-icon>person</mat-icon>
+          <span>Profile</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Back Button -->
+  <div class="navigation-bar">
+    <button class="back-button" (click)="navigateToDashboard()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Dashboard
+    </button>
+  </div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Profile Card -->
+    <div class="profile-card">
+      <!-- Profile Header -->
+      <div class="profile-header">
+        <div class="profile-info">
+          <div class="profile-avatar">
+            <mat-icon class="avatar-icon">person</mat-icon>
+          </div>
+          <div class="profile-details">
+            <h1 class="profile-name">{{ userName }}</h1>
+            <p class="profile-email">
+              <mat-icon>email</mat-icon>
+              {{ userEmail }}
+            </p>
+            <p class="profile-phone">
+              <mat-icon>phone</mat-icon>
+              {{ userPhone }}
+            </p>
+            <div class="profile-badges">
+              @if (isVerified) {
+              <span class="badge verified">
+                <mat-icon>verified</mat-icon>
+                Verified
+              </span>
+              } @if (isPremiumMember) {
+              <span class="badge premium">
+                <mat-icon>workspace_premium</mat-icon>
+                Premium Member
+              </span>
+              }
+            </div>
+          </div>
+        </div>
+        <button class="edit-profile-button" (click)="editProfile()">
+          <mat-icon>edit</mat-icon>
+          Edit Profile
+        </button>
+      </div>
+
+      <!-- Stats -->
+      <div class="profile-stats">
+        <div class="stat-item">
+          <mat-icon class="stat-icon">calendar_today</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ bookingsCount }}</div>
+            <div class="stat-label">Bookings</div>
+          </div>
+        </div>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">star</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">{{ avgRating }}</div>
+            <div class="stat-label">Avg Rating</div>
+          </div>
+        </div>
+        <div class="stat-item">
+          <mat-icon class="stat-icon">account_balance_wallet</mat-icon>
+          <div class="stat-content">
+            <div class="stat-value">₹{{ rewardsBalance }}</div>
+            <div class="stat-label">Rewards</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Saved Addresses -->
+    <section class="section">
+      <div class="section-header">
+        <h2 class="section-title">Saved Addresses</h2>
+        <button class="add-button" (click)="openAddAddressDialog()">
+          <mat-icon>add</mat-icon>
+          Add New
+        </button>
+      </div>
+
+      <div class="addresses-list">
+        @for (address of savedAddresses; track address.id) {
+        <div class="address-card disabled">
+          <div class="address-header">
+            <div class="address-type">
+              <mat-icon class="address-icon">
+                {{ address.type === "Home" ? "home" : "business" }}
+              </mat-icon>
+              <span class="address-type-label">{{ address.type }}</span>
+              @if (address.isDefault) {
+              <span class="default-badge">Default</span>
+              }
+            </div>
+          </div>
+          <div class="address-details">
+            <p class="address-line">{{ address.addressLine1 }}</p>
+            <p class="address-line">{{ address.addressLine2 }}</p>
+          </div>
+        </div>
+        }
+
+        <!-- Add Another Address Button -->
+        <button class="add-another-address" (click)="openAddAddressDialog()">
+          <mat-icon>add</mat-icon>
+          Add Another Address
+        </button>
+      </div>
+    </section>
+
+    <!-- Quick Actions -->
+    <section class="section">
+      <h2 class="section-title">Quick Actions</h2>
+      <div class="quick-actions">
+        @for (action of quickActions; track action.route) {
+        <div class="action-card" (click)="navigateTo(action.route)">
+          <div class="action-icon-wrapper">
+            <mat-icon class="action-icon">{{ action.icon }}</mat-icon>
+          </div>
+          <div class="action-content">
+            <h3 class="action-title">{{ action.title }}</h3>
+            <p class="action-description">{{ action.description }}</p>
+          </div>
+          <mat-icon class="action-arrow">chevron_right</mat-icon>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Logout Button -->
+    <div class="logout-section">
+      <button class="logout-button" (click)="logout()">Logout</button>
+    </div>
+  </main>
+</div>
+
+<!-- Add Address Dialog -->
+@if (showAddAddressDialog) {
+<app-add-address-dialog
+  (close)="closeAddAddressDialog()"
+></app-add-address-dialog>
+}

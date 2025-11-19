@@ -1,0 +1,102 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <button mat-icon-button class="logo-button" (click)="navigateToHome()">
+      <div class="logo">UF</div>
+    </button>
+    <button mat-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Results
+    </button>
+  </div>
+</header>
+
+<div class="address-container">
+  <h1 class="page-title">Service Address</h1>
+
+  <!-- Saved Addresses -->
+  <div class="addresses-card">
+    <div class="card-header">
+      <h2 class="section-title">Saved Addresses</h2>
+    </div>
+
+    <div class="addresses-list">
+      @for (address of savedAddresses; track address.id) {
+      <div
+        class="address-card"
+        [class.selected]="selectedAddressId === address.id"
+        (click)="selectAddress(address.id)"
+      >
+        <div class="address-icon">
+          <mat-icon>{{
+            address.type === "Home"
+              ? "home"
+              : address.type === "Office"
+              ? "business"
+              : "location_on"
+          }}</mat-icon>
+        </div>
+        <div class="address-content">
+          <div class="address-header">
+            <span class="address-type">{{ address.type }}</span>
+            @if (address.isDefault) {
+            <span class="default-badge">Default</span>
+            }
+          </div>
+          <p class="address-text">
+            {{ address.addressLine1 }}, {{ address.addressLine2 }}
+          </p>
+        </div>
+        <div class="address-radio">
+          <div
+            class="radio-button"
+            [class.checked]="selectedAddressId === address.id"
+          ></div>
+        </div>
+      </div>
+      }
+
+      <!-- Add New Address Button -->
+      <button
+        mat-button
+        class="add-address-button"
+        (click)="openAddAddressDialog()"
+      >
+        <mat-icon>add</mat-icon>
+        <span>Add New Address</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- Additional Instructions -->
+  <div class="instructions-card">
+    <h2 class="section-title">Additional Instructions</h2>
+    <textarea
+      class="instructions-input"
+      [(ngModel)]="additionalInstructions"
+      placeholder="Any specific instructions for the service provider (e.g., parking location, gate code)"
+      rows="4"
+    ></textarea>
+  </div>
+
+  <!-- Continue Button -->
+  <div class="action-section">
+    <button
+      mat-raised-button
+      class="continue-button"
+      [disabled]="!canContinue()"
+      (click)="continue()"
+    >
+      Continue to Summary
+    </button>
+  </div>
+</div>
+
+<!-- Add Address Dialog -->
+@if (showAddAddressDialog) {
+<app-add-address-dialog
+  (cancel)="closeAddAddressDialog()"
+  (save)="onAddressSaved($event)"
+>
+</app-add-address-dialog>
+}

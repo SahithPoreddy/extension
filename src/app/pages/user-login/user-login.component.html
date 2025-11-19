@@ -1,0 +1,111 @@
+<div class="login-container">
+  <!-- Header with Logo -->
+  <header class="header">
+    <div class="logo" (click)="navigateBack()">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span>UrbanFix</span>
+    </div>
+  </header>
+
+  <!-- Back Button -->
+  <div class="back-button-container">
+    <button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back
+    </button>
+  </div>
+
+  <!-- Login Form Card -->
+  <div class="login-card">
+    <!-- Logo in Card -->
+    <div class="card-logo">
+      <div class="logo-square">
+        <span>UF</span>
+      </div>
+    </div>
+
+    <!-- Title -->
+    <h1 class="title">Welcome Back</h1>
+    <p class="subtitle">Login to continue to UrbanFix</p>
+
+    <!-- Error Message -->
+    @if (errorMessage) {
+    <div class="error-banner">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorMessage }}</span>
+    </div>
+    }
+
+    <!-- Form -->
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <!-- Email Field -->
+      <div class="form-field">
+        <label for="email">Email Address</label>
+        <input
+          id="email"
+          type="email"
+          formControlName="email"
+          placeholder="Enter your email"
+        />
+      </div>
+
+      <!-- Password Field -->
+      <div class="form-field">
+        <label for="password">Password</label>
+        <div class="password-field">
+          <input
+            id="password"
+            [type]="showPassword ? 'text' : 'password'"
+            formControlName="password"
+            placeholder="Enter your password"
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            (click)="togglePasswordVisibility()"
+          >
+            <mat-icon>{{
+              showPassword ? "visibility_off" : "visibility"
+            }}</mat-icon>
+          </button>
+        </div>
+      </div>
+
+      <!-- Remember Me & Forgot Password -->
+      <div class="form-options">
+        <mat-checkbox formControlName="rememberMe"> Remember me </mat-checkbox>
+        <a class="forgot-password" (click)="onForgotPassword()"
+          >Forgot password?</a
+        >
+      </div>
+
+      <!-- Submit Button -->
+      <button type="submit" class="submit-button" [disabled]="isSubmitting">
+        {{ isSubmitting ? "Logging in..." : "Login" }}
+      </button>
+
+      <!-- Divider -->
+      <div class="divider">
+        <span>Or continue with</span>
+      </div>
+
+      <!-- Social Login Buttons -->
+      <div class="social-buttons">
+        <button type="button" class="social-button" (click)="onGoogleLogin()">
+          <mat-icon>account_circle</mat-icon>
+          Google
+        </button>
+        <button type="button" class="social-button" (click)="onFacebookLogin()">
+          <mat-icon>facebook</mat-icon>
+          Facebook
+        </button>
+      </div>
+
+      <!-- Sign Up Link -->
+      <div class="signup-link">
+        Don't have an account?
+        <a (click)="navigateToRegister()" class="link">Sign Up</a>
+      </div>
+    </form>
+  </div>
+</div>

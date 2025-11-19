@@ -1,0 +1,112 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <button mat-icon-button class="logo-button" (click)="navigateToHome()">
+      <div class="logo">UF</div>
+    </button>
+    <button mat-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Results
+    </button>
+  </div>
+</header>
+
+<div class="summary-container">
+  <h1 class="page-title">Order Summary</h1>
+
+  <div class="summary-content">
+    <!-- Left Column: Service Details -->
+    <div class="details-section">
+      <!-- Service Details Card -->
+      <div class="details-card">
+        <h2 class="card-title">Service Details</h2>
+
+        <div class="detail-row">
+          <span class="detail-label">Service</span>
+          <span class="detail-value">{{ bookingData?.serviceName }}</span>
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Date & Time</span>
+          <span class="detail-value"
+            >{{ getFormattedDate() }} at {{ getFormattedTime() }}</span
+          >
+        </div>
+
+        <div class="detail-row">
+          <span class="detail-label">Duration</span>
+          <span class="detail-value">{{ bookingData?.serviceDuration }}</span>
+        </div>
+      </div>
+
+      <!-- Service Address Card -->
+      <div class="details-card">
+        <h2 class="card-title">Service Address</h2>
+
+        <div class="address-info">
+          <div class="address-icon">
+            <mat-icon>location_on</mat-icon>
+          </div>
+          <div class="address-content">
+            <div class="address-type">
+              {{ bookingData?.selectedAddress?.type }}
+            </div>
+            <p class="address-text">{{ getAddressLine() }}</p>
+          </div>
+        </div>
+
+        @if (bookingData?.additionalInstructions) {
+        <div class="instructions-section">
+          <div class="instructions-label">Additional Instructions:</div>
+          <p class="instructions-text">
+            {{ bookingData?.additionalInstructions }}
+          </p>
+        </div>
+        }
+      </div>
+    </div>
+
+    <!-- Right Column: Price Details -->
+    <div class="price-section">
+      <div class="price-card">
+        <h2 class="card-title">Price Details</h2>
+
+        <div class="price-breakdown">
+          <div class="price-row">
+            <span class="price-label">Service Price</span>
+            <span class="price-value">₹{{ priceDetails?.subtotal }}</span>
+          </div>
+
+          <div class="price-row">
+            <span class="price-label">Convenience Fee</span>
+            <span class="price-value">₹{{ priceDetails?.convenienceFee }}</span>
+          </div>
+
+          @if (priceDetails?.discount && priceDetails.discount > 0) {
+          <div class="price-row discount-row">
+            <span class="price-label">Discount</span>
+            <span class="price-value discount-value"
+              >-₹{{ priceDetails?.discount }}</span
+            >
+          </div>
+          }
+
+          <div class="divider"></div>
+
+          <div class="price-row total-row">
+            <span class="total-label">Total</span>
+            <span class="total-value">₹{{ priceDetails?.total }}</span>
+          </div>
+        </div>
+
+        <button
+          mat-raised-button
+          class="payment-button"
+          (click)="proceedToPayment()"
+        >
+          Proceed to Payment
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,202 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <div class="header-left">
+      <button mat-icon-button class="logo-button" (click)="navigateToHome()">
+        <div class="logo">UF</div>
+      </button>
+    </div>
+    <div class="header-center">
+      <button mat-button class="back-button" (click)="navigateBack()">
+        <mat-icon>arrow_back</mat-icon>
+        Back to Results
+      </button>
+    </div>
+  </div>
+</header>
+
+@if (service) {
+<div class="service-details-container">
+  <!-- Service Image & Booking Card -->
+  <div class="service-header">
+    <div class="service-image-section">
+      <div class="image-wrapper">
+        @if (service.discount) {
+        <div class="discount-badge">{{ service.discount }}% OFF</div>
+        }
+        <img [src]="service.image" [alt]="service.name" class="service-image" />
+      </div>
+    </div>
+
+    <!-- Booking Card -->
+    <div class="booking-card">
+      <div class="pricing-section">
+        <div class="price-row">
+          @if (service.originalPrice) {
+          <span class="original-price">₹{{ service.originalPrice }}</span>
+          }
+          <span class="current-price">₹{{ service.price }}</span>
+        </div>
+        @if (service.discount) {
+        <div class="savings-text">
+          Save ₹{{ service.originalPrice! - service.price }} ({{
+            service.discount
+          }}% off)
+        </div>
+        }
+      </div>
+
+      <button mat-raised-button class="book-now-button" (click)="onBookNow()">
+        Book Now
+      </button>
+
+      <div class="guarantee-items">
+        <div class="guarantee-item">
+          <mat-icon class="guarantee-icon">verified</mat-icon>
+          <span>100% Safe & Secure Payment</span>
+        </div>
+        <div class="guarantee-item">
+          <mat-icon class="guarantee-icon">assignment_return</mat-icon>
+          <span>Flexible Rescheduling</span>
+        </div>
+        <div class="guarantee-item">
+          <mat-icon class="guarantee-icon">shield</mat-icon>
+          <span>Satisfaction Guaranteed</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Service Info -->
+  <div class="content-wrapper">
+    <!-- Service Title & Badge -->
+    <div class="service-title-section">
+      <span class="category-badge">{{ service.category }}</span>
+      <h1 class="service-title">{{ service.name }}</h1>
+      <div class="service-meta">
+        <div class="rating-info">
+          <mat-icon class="star-icon">star</mat-icon>
+          <span class="rating-value">{{ service.rating }}</span>
+          <span class="review-count">({{ service.reviewCount }} reviews)</span>
+        </div>
+        <div class="duration-info">
+          <mat-icon class="duration-icon">schedule</mat-icon>
+          <span>{{ service.duration }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- About this service -->
+    <section class="service-section">
+      <h2 class="section-title">About this service</h2>
+      <p class="service-description">{{ service.description }}</p>
+
+      <div class="whats-included">
+        <h3 class="subsection-title">What's included:</h3>
+        <ul class="included-list">
+          @for (item of service.whatsIncluded; track item) {
+          <li>
+            <mat-icon class="check-icon">check_circle</mat-icon>
+            <span>{{ item }}</span>
+          </li>
+          }
+        </ul>
+      </div>
+    </section>
+
+    <!-- Features -->
+    <section class="features-section">
+      <div class="features-grid">
+        @for (feature of service.features; track feature.icon) {
+        <div class="feature-card">
+          <div class="feature-icon-wrapper">
+            <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+          </div>
+          <div class="feature-content">
+            <h4 class="feature-title">{{ feature.title }}</h4>
+            <p class="feature-description">{{ feature.description }}</p>
+          </div>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Customer Reviews -->
+    <section class="reviews-section">
+      <h2 class="section-title">Customer Reviews</h2>
+
+      <div class="reviews-overview">
+        <div class="rating-summary">
+          <div class="rating-score">{{ service.rating }}</div>
+          <div class="rating-stars">
+            @for (star of getStarsArray(service.rating); track $index) {
+            <mat-icon class="star-icon">{{
+              star === 1 ? "star" : "star_border"
+            }}</mat-icon>
+            }
+          </div>
+          <div class="rating-text">{{ service.reviewCount }} reviews</div>
+        </div>
+
+        <div class="rating-breakdown">
+          @for (star of [5, 4, 3, 2, 1]; track star) {
+          <div class="rating-bar-row">
+            <span class="star-label">{{ star }}</span>
+            <mat-icon class="star-small">star</mat-icon>
+            <div class="rating-bar">
+              <div
+                class="rating-bar-fill"
+                [style.width.%]="getRatingPercentage(star)"
+              ></div>
+            </div>
+            <span class="rating-count">{{ getRatingDistribution(star) }}</span>
+          </div>
+          }
+        </div>
+      </div>
+
+      <!-- Individual Reviews -->
+      <div class="reviews-list">
+        @for (review of service.reviews; track review.id) {
+        <div class="review-card">
+          <div class="review-header">
+            <div class="reviewer-avatar">{{ review.userInitials }}</div>
+            <div class="reviewer-info">
+              <div class="reviewer-name">{{ review.userName }}</div>
+              <div class="review-date">{{ review.date }}</div>
+            </div>
+            <div class="review-rating">
+              @for (star of getStarsArray(review.rating); track $index) {
+              <mat-icon class="star-icon-small">{{
+                star === 1 ? "star" : "star_border"
+              }}</mat-icon>
+              }
+            </div>
+          </div>
+          <p class="review-comment">{{ review.comment }}</p>
+          <div class="review-footer">
+            <button mat-button class="helpful-button">
+              <mat-icon>thumb_up</mat-icon>
+              <span>Helpful ({{ review.helpful }})</span>
+            </button>
+          </div>
+        </div>
+        }
+      </div>
+
+      <button
+        mat-stroked-button
+        class="view-all-button"
+        (click)="viewAllReviews()"
+      >
+        View All {{ service.reviewCount }} Reviews
+      </button>
+    </section>
+  </div>
+</div>
+} @else {
+<div class="loading-container">
+  <p>Service not found</p>
+  <button mat-raised-button (click)="navigateBack()">Back to Services</button>
+</div>
+}

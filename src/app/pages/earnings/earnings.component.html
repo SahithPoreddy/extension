@@ -1,0 +1,350 @@
+<div class="dashboard-layout">
+  <!-- Sidebar Navigation -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="logo">
+        <mat-icon class="logo-icon">handyman</mat-icon>
+        <span class="logo-text">UrbanFix Partners</span>
+      </div>
+    </div>
+
+    <nav class="sidebar-nav">
+      @for (item of menuItems; track item.route) {
+      <a
+        class="nav-item"
+        [class.active]="isActive(item.route)"
+        (click)="navigate(item.route)"
+      >
+        <mat-icon class="nav-icon">{{ item.icon }}</mat-icon>
+        <span class="nav-label">{{ item.name }}</span>
+        @if (item.badge) {
+        <span class="nav-badge">{{ item.badge }}</span>
+        }
+      </a>
+      }
+    </nav>
+  </aside>
+
+  <!-- Main Content Area -->
+  <div class="main-content">
+    <!-- Top Header -->
+    <header class="top-header">
+      <div class="header-left">
+        <h1 class="page-title">Earnings & Payouts</h1>
+        <p class="page-subtitle">Track your earnings and manage payouts</p>
+      </div>
+      <div class="header-right">
+        <button
+          mat-stroked-button
+          class="download-btn"
+          (click)="downloadStatement()"
+        >
+          <mat-icon>download</mat-icon>
+          Download Statement
+        </button>
+        <button
+          mat-raised-button
+          class="payout-btn"
+          (click)="togglePayoutRequest()"
+        >
+          <mat-icon>payment</mat-icon>
+          Request Payout
+        </button>
+        <button
+          mat-icon-button
+          [matMenuTriggerFor]="userMenu"
+          class="user-menu-btn"
+        >
+          <mat-icon>account_circle</mat-icon>
+        </button>
+        <mat-menu #userMenu="matMenu">
+          <button mat-menu-item (click)="navigate('profile')">
+            <mat-icon>person</mat-icon>
+            <span>Profile</span>
+          </button>
+          <button mat-menu-item (click)="logout()">
+            <mat-icon>logout</mat-icon>
+            <span>Logout</span>
+          </button>
+        </mat-menu>
+      </div>
+    </header>
+
+    <!-- Earnings Content -->
+    <div class="earnings-content">
+      <!-- Earnings Summary Cards -->
+      <div class="earnings-summary">
+        <div class="summary-card total-earnings">
+          <div class="card-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">
+              ₹{{ earningsData.totalEarnings | number : "1.0-0" }}
+            </div>
+            <div class="card-label">Total Earnings</div>
+          </div>
+        </div>
+
+        <div class="summary-card available-balance">
+          <div class="card-icon">
+            <mat-icon>account_balance_wallet</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">
+              ₹{{ earningsData.availableBalance | number : "1.0-0" }}
+            </div>
+            <div class="card-label">Available Balance</div>
+          </div>
+        </div>
+
+        <div class="summary-card pending-payment">
+          <div class="card-icon">
+            <mat-icon>schedule</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">
+              ₹{{ earningsData.pendingPayment | number : "1.0-0" }}
+            </div>
+            <div class="card-label">Pending Payment</div>
+          </div>
+        </div>
+
+        <div class="summary-card last-payout">
+          <div class="card-icon">
+            <mat-icon>check_circle</mat-icon>
+          </div>
+          <div class="card-content">
+            <div class="card-value">
+              ₹{{ earningsData.lastPayout | number : "1.0-0" }}
+            </div>
+            <div class="card-label">Last Payout</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Request Payout Section -->
+      @if (showPayoutRequest) {
+      <div class="payout-request-section">
+        <div class="payout-card">
+          <h3 class="payout-title">Request Payout</h3>
+          <p class="payout-subtitle">
+            Transfer your available balance to your bank account
+          </p>
+
+          <div class="payout-info">
+            <div class="info-item">
+              <span class="info-label">Available for Payout:</span>
+              <span class="info-value"
+                >₹{{ earningsData.availableBalance | number : "1.0-0" }}</span
+              >
+            </div>
+            <div class="info-item">
+              <span class="info-label"
+                >Minimum payout: ₹ 200 • Processing time: 2-3 business
+                days</span
+              >
+            </div>
+          </div>
+
+          <div class="payout-input">
+            <mat-form-field appearance="outline" class="amount-field">
+              <mat-label>Enter Amount</mat-label>
+              <span matPrefix>₹&nbsp;</span>
+              <input
+                matInput
+                type="number"
+                [(ngModel)]="payoutAmount"
+                placeholder="0"
+                min="200"
+                [max]="earningsData.availableBalance"
+              />
+              @if (payoutAmount > earningsData.availableBalance) {
+              <mat-error>Amount exceeds available balance</mat-error>
+              } @if (payoutAmount > 0 && payoutAmount < 200) {
+              <mat-error>Minimum payout amount is ₹200</mat-error>
+              }
+            </mat-form-field>
+
+            <button
+              mat-raised-button
+              [disabled]="!isPayoutValid()"
+              (click)="requestPayout()"
+              class="request-payout-btn"
+            >
+              <mat-icon>payment</mat-icon>
+              Request Payout
+            </button>
+          </div>
+        </div>
+      </div>
+      }
+
+      <!-- Transaction History Tabs -->
+      <div class="history-section">
+        <mat-tab-group class="history-tabs" animationDuration="300ms">
+          <mat-tab label="Transaction History">
+            <div class="history-content">
+              <h3 class="history-title">
+                All your earnings and payouts in chronological order
+              </h3>
+
+              @if (transactions.length === 0) {
+              <div class="empty-state">
+                <mat-icon class="empty-icon">receipt_long</mat-icon>
+                <p>No transactions yet</p>
+              </div>
+              } @else {
+              <div class="transactions-list">
+                @for (transaction of transactions; track transaction.id) {
+                <div
+                  [class]="
+                    'transaction-item ' + getTransactionClass(transaction.type)
+                  "
+                >
+                  <div class="transaction-icon">
+                    <mat-icon>{{
+                      getTransactionIcon(transaction.type)
+                    }}</mat-icon>
+                  </div>
+                  <div class="transaction-details">
+                    <h4 class="transaction-title">{{ transaction.title }}</h4>
+                    @if (transaction.from) {
+                    <p class="transaction-from">{{ transaction.from }}</p>
+                    }
+                    <div class="transaction-meta">
+                      <span class="transaction-date">
+                        <mat-icon>calendar_today</mat-icon>
+                        {{ formatDate(transaction.date) }}
+                      </span>
+                      <span
+                        [class]="
+                          'transaction-status ' +
+                          getStatusClass(transaction.status)
+                        "
+                      >
+                        {{ transaction.status }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="transaction-amount">
+                    <span class="amount-value">
+                      {{ transaction.type === "earning" ? "+" : "-" }}₹{{
+                        transaction.amount | number : "1.0-0"
+                      }}
+                    </span>
+                  </div>
+                </div>
+                }
+              </div>
+              }
+            </div>
+          </mat-tab>
+
+          <mat-tab label="Payout History">
+            <div class="history-content">
+              <h3 class="history-title">Your payout history</h3>
+
+              @if (payoutHistory.length === 0) {
+              <div class="empty-state">
+                <mat-icon class="empty-icon">account_balance</mat-icon>
+                <p>No payouts yet</p>
+              </div>
+              } @else {
+              <div class="transactions-list">
+                @for (payout of payoutHistory; track payout.id) {
+                <div class="transaction-item transaction-payout">
+                  <div class="transaction-icon">
+                    <mat-icon>account_balance</mat-icon>
+                  </div>
+                  <div class="transaction-details">
+                    <h4 class="transaction-title">{{ payout.title }}</h4>
+                    <div class="transaction-meta">
+                      <span class="transaction-date">
+                        <mat-icon>calendar_today</mat-icon>
+                        {{ formatDate(payout.date) }}
+                      </span>
+                      <span
+                        [class]="
+                          'transaction-status ' + getStatusClass(payout.status)
+                        "
+                      >
+                        {{ payout.status }}
+                      </span>
+                    </div>
+                  </div>
+                  <div class="transaction-amount">
+                    <span class="amount-value"
+                      >-₹{{ payout.amount | number : "1.0-0" }}</span
+                    >
+                  </div>
+                </div>
+                }
+              </div>
+              }
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+      </div>
+
+      <!-- Bank Account Details -->
+      <div class="bank-details-section">
+        <div class="bank-card">
+          <div class="bank-header">
+            <h3 class="bank-title">Bank Account Details</h3>
+            <button
+              mat-stroked-button
+              (click)="updateBankDetails()"
+              class="update-btn"
+            >
+              <mat-icon>edit</mat-icon>
+              Update Bank Details
+            </button>
+          </div>
+          <p class="bank-subtitle">
+            Payouts will be transferred to this account
+          </p>
+
+          @if (bankDetails) {
+          <div class="bank-info">
+            <div class="bank-row">
+              <div class="bank-field">
+                <span class="field-label">Account Holder</span>
+                <span class="field-value">{{ bankDetails.accountHolder }}</span>
+              </div>
+              <div class="bank-field">
+                <span class="field-label">IFSC Code</span>
+                <span class="field-value">{{ bankDetails.ifsc }}</span>
+              </div>
+            </div>
+            <div class="bank-row">
+              <div class="bank-field">
+                <span class="field-label">Account Number</span>
+                <span class="field-value"
+                  >****{{ bankDetails.accountNumber }}</span
+                >
+              </div>
+            </div>
+          </div>
+          } @else {
+          <div class="no-bank-details">
+            <mat-icon class="warning-icon">warning</mat-icon>
+            <p>
+              No bank account details found. Please add your bank details to
+              receive payouts.
+            </p>
+            <button
+              mat-raised-button
+              (click)="updateBankDetails()"
+              class="add-btn"
+            >
+              <mat-icon>add</mat-icon>
+              Add Bank Details
+            </button>
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

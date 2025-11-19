@@ -1,0 +1,53 @@
+import { Routes } from '@angular/router';
+import { PartnerLandingComponent } from './pages/partner-landing/partner-landing.component';
+import { CustomerLandingComponent } from './pages/customer-landing/customer-landing.component';
+import { PartnerRegistrationComponent } from './pages/partner-registration/partner-registration.component';
+import { PartnerDashboardComponent } from './pages/partner-dashboard/partner-dashboard.component';
+import { PartnerLoginComponent } from './pages/partner-login/partner-login.component';
+import { PartnerProfileComponent } from './pages/partner-profile/partner-profile.component';
+import { ManageServicesComponent } from './pages/manage-services/manage-services.component';
+import { PortfolioComponent } from './pages/portfolio/portfolio.component';
+import { MyBookingsComponent } from './pages/my-bookings/my-bookings.component';
+import { EarningsComponent } from './pages/earnings/earnings.component';
+import { ReviewsComponent } from './pages/reviews/reviews.component';
+import { NotificationsComponent } from './pages/notifications/notifications.component';
+import { SupportComponent } from './pages/support/support.component';
+import { UserRegistrationComponent } from './pages/user-registration/user-registration.component';
+import { UserLoginComponent } from './pages/user-login/user-login.component';
+import { UserDashboardComponent } from './pages/user-dashboard/user-dashboard.component';
+import { UserServicesComponent } from './pages/user-services/user-services.component';
+import { UserProfileComponent } from './pages/user-profile/user-profile.component';
+import { UserServiceDetailsComponent } from './pages/user-service-details/user-service-details.component';
+import { BookingScheduleComponent } from './pages/booking-schedule/booking-schedule.component';
+import { BookingAddressComponent } from './pages/booking-address/booking-address.component';
+import { BookingSummaryComponent } from './pages/booking-summary/booking-summary.component';
+import { PaymentComponent } from './pages/payment/payment.component';
+import { BookingConfirmationComponent } from './pages/booking-confirmation/booking-confirmation.component';
+
+export const routes: Routes = [
+  { path: '', redirectTo: '/partner', pathMatch: 'full' },
+  { path: 'partner', component: PartnerLandingComponent },
+  { path: 'customer', component: CustomerLandingComponent },
+  { path: 'partner/login', component: PartnerLoginComponent },
+  { path: 'partner/register', component: PartnerRegistrationComponent },
+  { path: 'partner/dashboard', component: PartnerDashboardComponent },
+  { path: 'partner/profile', component: PartnerProfileComponent },
+  { path: 'partner/services', component: ManageServicesComponent },
+  { path: 'partner/portfolio', component: PortfolioComponent },
+  { path: 'partner/bookings', component: MyBookingsComponent },
+  { path: 'partner/earnings', component: EarningsComponent },
+  { path: 'partner/reviews', component: ReviewsComponent },
+  { path: 'partner/notifications', component: NotificationsComponent },
+  { path: 'partner/support', component: SupportComponent },
+  { path: 'user/register', component: UserRegistrationComponent },
+  { path: 'user/login', component: UserLoginComponent },
+  { path: 'user/dashboard', component: UserDashboardComponent },
+  { path: 'user/services', component: UserServicesComponent },
+  { path: 'user/service/:id', component: UserServiceDetailsComponent },
+  { path: 'user/profile', component: UserProfileComponent },
+  { path: 'booking/schedule', component: BookingScheduleComponent },
+  { path: 'booking/address', component: BookingAddressComponent },
+  { path: 'booking/summary', component: BookingSummaryComponent },
+  { path: 'booking/payment', component: PaymentComponent },
+  { path: 'booking/confirmation/:id', component: BookingConfirmationComponent },
+];

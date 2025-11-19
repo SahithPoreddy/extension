@@ -1,0 +1,89 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-content">
+    <button mat-icon-button class="logo-button" (click)="navigateToHome()">
+      <div class="logo">UF</div>
+    </button>
+    <button mat-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+      Back to Results
+    </button>
+  </div>
+</header>
+
+<div class="schedule-container">
+  <h1 class="page-title">Schedule Your Service</h1>
+
+  <div class="schedule-content">
+    <!-- Calendar Section -->
+    <div class="calendar-section">
+      <h2 class="section-title">Select Date</h2>
+
+      <div class="calendar-card">
+        <div class="calendar-header">
+          <button mat-icon-button (click)="previousMonth()" class="nav-button">
+            <mat-icon>chevron_left</mat-icon>
+          </button>
+          <div class="month-year">
+            {{ monthNames[currentMonth] }} {{ currentYear }}
+          </div>
+          <button mat-icon-button (click)="nextMonth()" class="nav-button">
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
+
+        <div class="calendar-grid">
+          <!-- Day names -->
+          @for (dayName of dayNames; track dayName) {
+          <div class="day-name">{{ dayName }}</div>
+          }
+
+          <!-- Calendar days -->
+          @for (day of calendarDays; track day.date) {
+          <div
+            class="calendar-day"
+            [class.other-month]="!day.isCurrentMonth"
+            [class.today]="day.isToday"
+            [class.past]="day.isPast"
+            [class.selected]="day.isSelected"
+            (click)="selectDate(day)"
+          >
+            {{ day.day }}
+          </div>
+          }
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Selection Section -->
+    <div class="time-section">
+      <h2 class="section-title">Select Time</h2>
+
+      <div class="time-slots">
+        @for (slot of timeSlots; track slot.value) {
+        <button
+          mat-stroked-button
+          class="time-slot"
+          [class.selected]="selectedTime === slot.time"
+          [disabled]="isTimeDisabled(slot) || !selectedDate"
+          (click)="selectTime(slot)"
+        >
+          {{ slot.time }}
+        </button>
+        }
+      </div>
+    </div>
+  </div>
+
+  <!-- Continue Button -->
+  <div class="action-section">
+    <button
+      mat-raised-button
+      class="continue-button"
+      [disabled]="!canContinue()"
+      (click)="continue()"
+    >
+      Continue
+    </button>
+  </div>
+</div>

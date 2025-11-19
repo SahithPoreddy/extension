@@ -1,0 +1,210 @@
+<!-- Header -->
+<header class="header">
+  <div class="header-container">
+    <div class="logo">
+      <mat-icon class="logo-icon">handyman</mat-icon>
+      <span class="logo-text">UrbanFix Partners</span>
+    </div>
+    <nav class="nav-buttons">
+      <button mat-stroked-button class="login-btn" (click)="navigateToLogin()">
+        Login
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        class="register-btn"
+        (click)="navigateToRegister()"
+      >
+        Register Now
+      </button>
+    </nav>
+  </div>
+</header>
+
+<!-- Hero Section -->
+<section class="hero-section">
+  <div class="hero-container">
+    <div class="hero-content">
+      <h1 class="hero-title">Grow Your Business<br />with UrbanFix</h1>
+      <p class="hero-description">
+        Join thousands of service professionals earning more by<br />
+        connecting with customers in your area. Set your own<br />
+        schedule, prices, and build a thriving business.
+      </p>
+      <div class="hero-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          class="become-partner-btn"
+          (click)="navigateToRegister()"
+        >
+          Become a Partner
+        </button>
+        <button mat-stroked-button class="learn-more-btn">Learn More</button>
+      </div>
+    </div>
+
+    <div class="hero-carousel">
+      <div class="carousel-container">
+        @for (image of carouselImages; track $index) {
+        <img
+          [src]="image"
+          [alt]="'Carousel image ' + ($index + 1)"
+          class="carousel-image"
+          [class.active]="currentImageIndex === $index"
+        />
+        }
+
+        <!-- Floating Statistics -->
+        @for (stat of statistics; track stat.label) {
+        <div
+          class="floating-stat"
+          [style.top]="stat.position.top"
+          [style.left]="stat.position.left"
+          [style.right]="stat.position.right"
+        >
+          <div class="stat-value">{{ stat.value }}</div>
+          <div class="stat-label">{{ stat.label }}</div>
+        </div>
+        }
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Overall Statistics Section -->
+<section class="stats-section">
+  <div class="stats-container">
+    @for (stat of overallStats; track stat.label) {
+    <div class="stat-item">
+      <div class="stat-value-large">{{ stat.value }}</div>
+      <div class="stat-label-small">{{ stat.label }}</div>
+    </div>
+    }
+  </div>
+</section>
+
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+  <h2 class="section-title">How It Works</h2>
+  <div class="steps-container">
+    @for (step of howItWorksSteps; track step.number) {
+    <mat-card class="step-card">
+      <mat-card-content>
+        <div class="step-number">{{ step.number }}</div>
+        <h3 class="step-title">{{ step.title }}</h3>
+        <p class="step-description">{{ step.description }}</p>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+</section>
+
+<!-- Why Partner With Us Section -->
+<section class="features-section">
+  <h2 class="section-title">Why Partner With Us?</h2>
+  <div class="features-container">
+    @for (feature of features; track feature.title) {
+    <mat-card class="feature-card">
+      <mat-card-content>
+        <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
+        <h3 class="feature-title">{{ feature.title }}</h3>
+        <p class="feature-description">{{ feature.description }}</p>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+</section>
+
+<!-- Testimonials Section -->
+<section class="testimonials-section">
+  <h2 class="section-title">What Our Partners Say</h2>
+  <div class="testimonials-container">
+    @for (testimonial of testimonials; track testimonial.name) {
+    <mat-card class="testimonial-card">
+      <mat-card-content>
+        <div class="rating">
+          @for (star of getStarArray(testimonial.rating); track $index) {
+          <mat-icon class="star-icon" [class.filled]="star">
+            {{ star ? "star" : "star_border" }}
+          </mat-icon>
+          }
+        </div>
+        <p class="testimonial-text">{{ testimonial.text }}</p>
+        <div class="testimonial-author">
+          <div class="author-name">{{ testimonial.name }}</div>
+          <div class="author-role">{{ testimonial.role }}</div>
+        </div>
+      </mat-card-content>
+    </mat-card>
+    }
+  </div>
+</section>
+
+<!-- Ready to Start Earning Section -->
+<section class="cta-section">
+  <div class="cta-container">
+    <h2 class="cta-title">Ready to Start Earning?</h2>
+    <p class="cta-description">
+      Join thousands of professionals growing their business with UrbanFix.
+      Registration takes<br />
+      less than 5 minutes.
+    </p>
+    <button
+      mat-raised-button
+      color="primary"
+      class="cta-btn"
+      (click)="navigateToRegister()"
+    >
+      Register as Partner
+    </button>
+  </div>
+</section>
+
+<!-- Footer -->
+<footer class="footer">
+  <div class="footer-container">
+    <div class="footer-column">
+      <h4 class="footer-title">UrbanFix Partners</h4>
+      <p class="footer-text">
+        Partnering with top professionals<br />
+        to deliver exceptional services.
+      </p>
+    </div>
+
+    <div class="footer-column">
+      <h4 class="footer-title">Company</h4>
+      <ul class="footer-links">
+        <li><a href="#">About Us</a></li>
+        <li><a href="#">Contact</a></li>
+        <li><a href="#">Careers</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h4 class="footer-title">Support</h4>
+      <ul class="footer-links">
+        <li><a href="#">Help Center</a></li>
+        <li><a href="#">Partner FAQs</a></li>
+        <li><a href="#">Terms & Conditions</a></li>
+      </ul>
+    </div>
+
+    <div class="footer-column">
+      <h4 class="footer-title">Contact</h4>
+      <ul class="footer-links">
+        <li>Email: partners&#64;urbanfix.com</li>
+        <li>Phone: 1800-XXX-XXXX</li>
+        <li>
+          <a href="#" (click)="navigateToCustomer(); $event.preventDefault()"
+            >For Customers</a
+          >
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="footer-bottom">
+    <p>&copy; 2025 UrbanFix. All rights reserved.</p>
+  </div>
+</footer>
