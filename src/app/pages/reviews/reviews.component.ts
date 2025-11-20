@@ -113,9 +113,22 @@ export class ReviewsComponent implements OnInit {
 
   loadReviews() {
     // Load all reviews for this partner
-    this.http.get<Review[]>(`/api/reviews?partnerId=${this.partnerId}`).subscribe({
+    this.http.get<any[]>(`/api/userReviews?partnerId=${this.partnerId}`).subscribe({
       next: (reviews) => {
-        this.allReviews = reviews.sort((a, b) => 
+        // Map API response to component interface
+        this.allReviews = reviews.map(r => ({
+          id: r.id,
+          customerId: r.userId,
+          customerName: r.customerName || 'Customer',
+          customerInitials: r.customerName ? r.customerName.charAt(0).toUpperCase() : 'C',
+          serviceId: r.serviceId || r.bookingId,
+          serviceName: r.serviceName,
+          rating: r.rating,
+          comment: r.comment || '',
+          date: r.createdAt || r.date,
+          partnerResponse: r.partnerResponse,
+          responseDate: r.responseDate
+        })).sort((a, b) => 
           new Date(b.date).getTime() - new Date(a.date).getTime()
         );
         this.filteredReviews = [...this.allReviews];
@@ -198,7 +211,9 @@ export class ReviewsComponent implements OnInit {
   }
 
   formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
     const day = date.getDate().toString().padStart(2, '0');
     const month = (date.getMonth() + 1).toString().padStart(2, '0');
     const year = date.getFullYear();

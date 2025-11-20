@@ -1,0 +1,81 @@
+<h2 mat-dialog-title>
+  <mat-icon>account_balance</mat-icon>
+  Update Bank Account Details
+</h2>
+
+<mat-dialog-content>
+  <form [formGroup]="bankDetailsForm" class="bank-form">
+    <p class="dialog-subtitle">
+      Enter your bank account details to receive payouts
+    </p>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Account Holder Name</mat-label>
+      <input
+        matInput
+        formControlName="accountHolder"
+        placeholder="Enter account holder name"
+      />
+      <mat-icon matPrefix>person</mat-icon>
+      @if (bankDetailsForm.get('accountHolder')?.invalid &&
+      bankDetailsForm.get('accountHolder')?.touched) {
+      <mat-error>{{ getAccountHolderError() }}</mat-error>
+      }
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>Account Number</mat-label>
+      <input
+        matInput
+        formControlName="accountNumber"
+        [type]="hideAccountNumber ? 'password' : 'text'"
+        placeholder="Enter account number"
+      />
+      <mat-icon matPrefix>account_balance_wallet</mat-icon>
+      <button
+        mat-icon-button
+        matSuffix
+        (click)="toggleAccountNumberVisibility()"
+        type="button"
+      >
+        <mat-icon>{{
+          hideAccountNumber ? "visibility" : "visibility_off"
+        }}</mat-icon>
+      </button>
+      @if (bankDetailsForm.get('accountNumber')?.invalid &&
+      bankDetailsForm.get('accountNumber')?.touched) {
+      <mat-error>{{ getAccountNumberError() }}</mat-error>
+      }
+      <mat-hint>9-18 digit account number</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline" class="full-width">
+      <mat-label>IFSC Code</mat-label>
+      <input
+        matInput
+        formControlName="ifsc"
+        placeholder="Enter IFSC code"
+        maxlength="11"
+        style="text-transform: uppercase"
+      />
+      <mat-icon matPrefix>code</mat-icon>
+      @if (bankDetailsForm.get('ifsc')?.invalid &&
+      bankDetailsForm.get('ifsc')?.touched) {
+      <mat-error>{{ getIfscError() }}</mat-error>
+      }
+      <mat-hint>11 character IFSC code (e.g., HDFC0001234)</mat-hint>
+    </mat-form-field>
+  </form>
+</mat-dialog-content>
+
+<mat-dialog-actions align="end">
+  <button mat-button (click)="onCancel()">Cancel</button>
+  <button
+    mat-raised-button
+    color="primary"
+    (click)="onSave()"
+    [disabled]="bankDetailsForm.invalid"
+  >
+    Save Details
+  </button>
+</mat-dialog-actions>

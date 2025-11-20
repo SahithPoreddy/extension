@@ -8,8 +8,10 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatTabsModule } from '@angular/material/tabs';
+import { MatDialog } from '@angular/material/dialog';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { BankDetailsDialogComponent } from './bank-details-dialog/bank-details-dialog.component';
 
 interface MenuItem {
   name: string;
@@ -54,6 +56,7 @@ interface EarningsData {
 export class EarningsComponent implements OnInit {
   partnerName: string = '';
   partnerId: string = '';
+  partnerData: any = null;
   
   earningsData: EarningsData = {
     totalEarnings: 0,
@@ -85,7 +88,8 @@ export class EarningsComponent implements OnInit {
   constructor(
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService
+    private authService: AuthService,
+    private dialog: MatDialog
   ) {}
 
   ngOnInit(): void {
@@ -105,20 +109,31 @@ export class EarningsComponent implements OnInit {
     // Load partner data
     this.http.get<any>(`/api/users/${this.partnerId}`).subscribe({
       next: (partner) => {
+        this.partnerData = partner;
         this.bankDetails = partner.bankAccount;
       }
     });
 
-    // Load earnings data
-    this.http.get<any[]>('/api/earnings').subscribe({
-      next: (earnings) => {
-        const partnerEarnings = earnings.find(e => e.partnerId === this.partnerId);
-        if (partnerEarnings) {
-          this.earningsData.totalEarnings = partnerEarnings.totalEarnings || 0;
-          this.earningsData.availableBalance = partnerEarnings.availableBalance || 0;
-          this.earningsData.pendingPayment = partnerEarnings.pendingPayment || 0;
-          this.earningsData.lastPayout = partnerEarnings.lastPayout || 0;
-        }
+    // Calculate earnings from completed bookings
+    this.http.get<any[]>('/api/bookings').subscribe({
+      next: (bookings) => {
+        const partnerBookings = bookings.filter(b => b.partnerId === this.partnerId);
+        
+        // Calculate total earnings from completed bookings
+        const completedBookings = partnerBookings.filter(b => b.status === 'Completed');
+        const totalEarnings = completedBookings.reduce((sum, b) => sum + (b.amount || 0), 0);
+        
+        // Calculate pending payment from confirmed/in-progress bookings
+        const pendingBookings = partnerBookings.filter(b => 
+          b.status === 'Confirmed' || b.status === 'In Progress'
+        );
+        const pendingPayment = pendingBookings.reduce((sum, b) => sum + (b.amount || 0), 0);
+        
+        this.earningsData.totalEarnings = totalEarnings;
+        this.earningsData.pendingPayment = pendingPayment;
+        
+        // Load payout history to calculate available balance
+        this.loadPayoutHistory(totalEarnings);
       }
     });
 
@@ -138,6 +153,34 @@ export class EarningsComponent implements OnInit {
         }));
 
         this.payoutHistory = this.transactions.filter(t => t.type === 'payout');
+      },
+      error: (error) => {
+        console.error('Error loading transactions:', error);
+        // Continue even if transactions fail
+      }
+    });
+  }
+
+  loadPayoutHistory(totalEarnings: number): void {
+    this.http.get<any[]>('/api/transactions').subscribe({
+      next: (transactions) => {
+        const partnerPayouts = transactions.filter(t => 
+          t.partnerId === this.partnerId && t.type === 'payout' && t.status === 'Completed'
+        );
+        
+        const totalPayouts = partnerPayouts.reduce((sum, t) => sum + (t.amount || 0), 0);
+        const lastPayout = partnerPayouts.length > 0 
+          ? partnerPayouts[partnerPayouts.length - 1].amount 
+          : 0;
+        
+        this.earningsData.availableBalance = totalEarnings - totalPayouts;
+        this.earningsData.lastPayout = lastPayout;
+      },
+      error: (error) => {
+        console.error('Error loading payout history:', error);
+        // If no transaction history, all earnings are available
+        this.earningsData.availableBalance = totalEarnings;
+        this.earningsData.lastPayout = 0;
       }
     });
   }
@@ -170,6 +213,11 @@ export class EarningsComponent implements OnInit {
   requestPayout(): void {
     if (!this.isPayoutValid()) return;
 
+    if (!this.bankDetails) {
+      alert('Please add your bank details before requesting a payout.');
+      return;
+    }
+
     // Create payout transaction
     const newTransaction = {
       id: `TXN${Date.now()}`,
@@ -182,28 +230,42 @@ export class EarningsComponent implements OnInit {
       toBankAccount: this.bankDetails
     };
 
-    // Add transaction
+    // Add transaction to API
     this.http.post('/api/transactions', newTransaction).subscribe({
       next: () => {
-        // Update earnings
-        this.http.get<any[]>('/api/earnings').subscribe({
-          next: (earnings) => {
-            const partnerEarningsIndex = earnings.findIndex(e => e.partnerId === this.partnerId);
-            
-            if (partnerEarningsIndex !== -1) {
-              earnings[partnerEarningsIndex].availableBalance -= this.payoutAmount;
-              earnings[partnerEarningsIndex].lastPayout = this.payoutAmount;
-              
-              this.http.put(`/api/earnings/${earnings[partnerEarningsIndex].id}`, earnings[partnerEarningsIndex]).subscribe({
-                next: () => {
-                  this.showPayoutRequest = false;
-                  this.payoutAmount = 0;
-                  this.loadEarningsData();
-                }
-              });
-            }
-          }
+        // Immediately update local state
+        this.earningsData.availableBalance -= this.payoutAmount;
+        this.earningsData.lastPayout = this.payoutAmount;
+        
+        // Add to transaction history
+        this.transactions.unshift({
+          id: newTransaction.id,
+          type: 'payout',
+          title: newTransaction.title,
+          amount: newTransaction.amount,
+          date: newTransaction.date,
+          status: 'Completed'
         });
+        
+        // Add to payout history
+        this.payoutHistory.unshift({
+          id: newTransaction.id,
+          type: 'payout',
+          title: newTransaction.title,
+          amount: newTransaction.amount,
+          date: newTransaction.date,
+          status: 'Completed'
+        });
+        
+        // Reset form
+        this.showPayoutRequest = false;
+        this.payoutAmount = 0;
+        
+        alert(`Payout of ₹${newTransaction.amount} has been processed successfully!`);
+      },
+      error: (error) => {
+        console.error('Error processing payout:', error);
+        alert('Failed to process payout. Please try again.');
       }
     });
   }
@@ -212,8 +274,40 @@ export class EarningsComponent implements OnInit {
     alert('Downloading earnings statement...');
   }
 
+  getMaskedAccountNumber(accountNumber: string): string {
+    if (!accountNumber) return '';
+    const last4 = accountNumber.slice(-4);
+    return `****${last4}`;
+  }
+
   updateBankDetails(): void {
-    alert('Bank details update functionality would open a modal here');
+    const dialogRef = this.dialog.open(BankDetailsDialogComponent, {
+      width: '550px',
+      data: this.bankDetails
+    });
+
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        // Update partner data with new bank details
+        const updatedPartner = {
+          ...this.partnerData,
+          bankAccount: result
+        };
+
+        // Update bank details via API
+        this.http.put(`/api/users/${this.partnerId}`, updatedPartner).subscribe({
+          next: (response: any) => {
+            this.bankDetails = result;
+            this.partnerData = updatedPartner;
+            alert('Bank details updated successfully!');
+          },
+          error: (error) => {
+            console.error('Error updating bank details:', error);
+            alert('Failed to update bank details. Please try again.');
+          }
+        });
+      }
+    });
   }
 
   formatDate(dateString: string): string {

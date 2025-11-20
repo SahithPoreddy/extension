@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatBadgeModule } from '@angular/material/badge';
+import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
 
 interface QuickAction {
@@ -85,83 +86,18 @@ export class UserDashboardComponent implements OnInit {
     { icon: 'support_agent', label: 'Support', route: '/user/support' }
   ];
 
-  recentBookings: Booking[] = [
-    {
-      id: '1',
-      serviceName: 'Deep Home Cleaning',
-      provider: 'John Smith',
-      date: 'Jan 15, 2025',
-      status: 'completed',
-      rating: 5
-    },
-    {
-      id: '2',
-      serviceName: 'Plumbing Repair',
-      provider: 'Mike Johnson',
-      date: 'Jan 20, 2025',
-      status: 'upcoming'
-    }
-  ];
+  recentBookings: Booking[] = [];
 
-  recommendedServices: Service[] = [
-    {
-      id: '1',
-      name: 'AC Service & Repair',
-      image: 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400',
-      price: 599,
-      originalPrice: 999,
-      discount: '40% OFF',
-      rating: 4.8,
-      reviews: 2234,
-      duration: '2-3 hours'
-    },
-    {
-      id: '2',
-      name: 'Kitchen Deep Cleaning',
-      image: 'https://images.unsplash.com/photo-1585659722983-3a675dabf23d?w=400',
-      price: 799,
-      originalPrice: 1199,
-      discount: '33% OFF',
-      rating: 4.7,
-      reviews: 3103,
-      duration: '3 hours',
-      badge: 'Cleaning'
-    },
-    {
-      id: '3',
-      name: 'Electrical Repairs',
-      image: 'https://images.unsplash.com/photo-1621905251918-48416bd8575a?w=400',
-      price: 299,
-      rating: 4.5,
-      reviews: 4432,
-      duration: '1 hour',
-      badge: 'Electrical'
-    },
-    {
-      id: '4',
-      name: 'Painting Services',
-      image: 'https://images.unsplash.com/photo-1562259949-e8e7689d7828?w=400',
-      price: 1299,
-      rating: 4.6,
-      reviews: 1876,
-      duration: '1-2 days',
-      badge: 'Painting'
-    }
-  ];
+  recommendedServices: Service[] = [];
 
-  popularCategories: Category[] = [
-    { id: 'cleaning', name: 'Cleaning', icon: 'cleaning_services' },
-    { id: 'plumbing', name: 'Plumbing', icon: 'plumbing' },
-    { id: 'electrical', name: 'Electrical', icon: 'electrical_services' },
-    { id: 'painting', name: 'Painting', icon: 'format_paint' },
-    { id: 'carpentry', name: 'Carpentry', icon: 'carpenter' }
-  ];
+  popularCategories: Category[] = [];
 
   allServices: Service[] = [];
 
   constructor(
     private router: Router,
-    private authService: AuthService
+    private authService: AuthService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -169,10 +105,147 @@ export class UserDashboardComponent implements OnInit {
     const user = this.authService.getCurrentUser();
     if (user) {
       this.userName = user.userName;
+      // Load unread notification count
+      this.loadNotificationCount(user.id);
+      // Load recent bookings
+      this.loadRecentBookings(user.id);
     }
 
-    // Initialize all services for search
-    this.allServices = [...this.recommendedServices];
+    // Load services and categories from backend
+    this.loadServices();
+    this.loadCategories();
+  }
+
+  loadServices(): void {
+    this.http.get<any[]>('/api/services').subscribe({
+      next: (services) => {
+        // Map services to the Service interface format
+        this.recommendedServices = services
+          .filter(s => s.active)
+          .slice(0, 4)
+          .map(service => {
+            const averageRating = this.calculateAverageRating(service.ratings || []);
+            const originalPrice = service.hasOffer ? Math.round(service.price / (1 - service.offerDiscount / 100)) : undefined;
+            
+            return {
+              id: service.id,
+              name: service.title,
+              image: service.image || 'https://images.unsplash.com/photo-1581092918056-0c4c3acd3789?w=400',
+              price: service.price,
+              originalPrice: originalPrice,
+              discount: service.hasOffer ? `${service.offerDiscount}% OFF` : undefined,
+              rating: averageRating,
+              reviews: service.ratings?.length || 0,
+              duration: this.formatDuration(service.duration, service.priceType),
+              badge: service.categoryId
+            };
+          });
+        
+        // Initialize all services for search
+        this.allServices = [...this.recommendedServices];
+      },
+      error: (error) => {
+        console.error('Error loading services:', error);
+        this.recommendedServices = [];
+      }
+    });
+  }
+
+  loadCategories(): void {
+    this.http.get<any[]>('/api/categories').subscribe({
+      next: (categories) => {
+        this.popularCategories = categories.map(cat => ({
+          id: cat.id,
+          name: cat.name,
+          icon: this.getCategoryIcon(cat.icon)
+        }));
+      },
+      error: (error) => {
+        console.error('Error loading categories:', error);
+        this.popularCategories = [];
+      }
+    });
+  }
+
+  calculateAverageRating(ratings: any[]): number {
+    if (!ratings || ratings.length === 0) return 0;
+    const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round((sum / ratings.length) * 10) / 10;
+  }
+
+  formatDuration(duration: number, priceType: string): string {
+    if (priceType === 'daily') {
+      return duration === 1 ? '1 day' : `${duration} days`;
+    } else if (priceType === 'hourly') {
+      const hours = Math.floor(duration / 60);
+      return hours === 1 ? '1 hour' : `${hours} hours`;
+    }
+    return `${duration} mins`;
+  }
+
+  getCategoryIcon(iconName: string): string {
+    const iconMap: { [key: string]: string } = {
+      'electrical': 'electrical_services',
+      'plumbing': 'plumbing',
+      'carpentry': 'carpenter',
+      'cleaning': 'cleaning_services',
+      'painting': 'format_paint'
+    };
+    return iconMap[iconName.toLowerCase()] || iconName;
+  }
+
+  loadRecentBookings(userId: string): void {
+    this.http.get<any[]>('/api/bookings').subscribe({
+      next: (bookings) => {
+        // Filter bookings for current user and get the most recent ones
+        const userBookings = bookings
+          .filter(b => b.userId === userId)
+          .sort((a, b) => new Date(b.createdAt || b.date).getTime() - new Date(a.createdAt || a.date).getTime())
+          .slice(0, 5);
+        
+        // Map to the Booking interface format
+        this.recentBookings = userBookings.map(booking => ({
+          id: booking.id,
+          serviceName: booking.serviceName,
+          provider: booking.partnerName,
+          date: this.formatDate(booking.date),
+          status: this.mapStatus(booking.status),
+          rating: booking.rating
+        }));
+      },
+      error: (error) => {
+        console.error('Error loading recent bookings:', error);
+        this.recentBookings = [];
+      }
+    });
+  }
+
+  formatDate(dateString: string): string {
+    const date = new Date(dateString);
+    const options: Intl.DateTimeFormatOptions = { month: 'short', day: 'numeric', year: 'numeric' };
+    return date.toLocaleDateString('en-US', options);
+  }
+
+  mapStatus(status: string): 'completed' | 'upcoming' | 'cancelled' {
+    const statusLower = status.toLowerCase();
+    if (statusLower === 'completed') return 'completed';
+    if (statusLower === 'cancelled') return 'cancelled';
+    return 'upcoming';
+  }
+
+  loadNotificationCount(userId: string): void {
+    this.http.get<any[]>('/api/notifications').subscribe({
+      next: (notifications) => {
+        const unreadCount = notifications.filter(
+          n => n.userId === userId && !n.isRead
+        ).length;
+        this.notificationCount = unreadCount;
+      },
+      error: (error) => {
+        console.error('Error loading notifications:', error);
+        // Keep default count on error
+      }
+    });
   }
 
   navigateToHome(): void {

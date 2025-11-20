@@ -1,0 +1,62 @@
+<div class="notifications-container">
+  <div class="notifications-header">
+    <div class="header-left">
+      <button mat-icon-button class="back-button" (click)="navigateBack()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <h1>Notifications</h1>
+    </div>
+    @if (getUnreadCount() > 0) {
+    <button mat-button class="mark-read-btn" (click)="markAllAsRead()">
+      Mark all as read
+    </button>
+    }
+  </div>
+
+  <div class="notifications-content">
+    @if (loading) {
+    <div class="loading-state">
+      <p>Loading notifications...</p>
+    </div>
+    } @else if (notifications.length === 0) {
+    <div class="empty-state">
+      <mat-icon>notifications_none</mat-icon>
+      <h3>No notifications yet</h3>
+      <p>You'll see updates about your bookings and services here</p>
+    </div>
+    } @else {
+    <div class="notifications-list">
+      @for (notification of notifications; track notification.id) {
+      <div
+        class="notification-card"
+        [class.unread]="!notification.isRead"
+        (click)="markAsRead(notification)"
+      >
+        <div
+          class="notification-icon"
+          [style.background-color]="notification.iconColor + '20'"
+        >
+          <mat-icon [style.color]="notification.iconColor">{{
+            notification.icon
+          }}</mat-icon>
+        </div>
+
+        <div class="notification-content">
+          <div class="notification-header">
+            <h3>{{ notification.title }}</h3>
+            <span class="notification-time">{{
+              getTimeAgo(notification.timestamp)
+            }}</span>
+          </div>
+          <p class="notification-message">{{ notification.message }}</p>
+        </div>
+
+        @if (!notification.isRead) {
+        <div class="unread-indicator"></div>
+        }
+      </div>
+      }
+    </div>
+    }
+  </div>
+</div>

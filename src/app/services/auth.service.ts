@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { v4 as uuidv4 } from 'uuid';
 
 export interface User {
@@ -132,7 +132,7 @@ export class AuthService {
   // Registration method
   register(registrationData: { fullName: string, email: string, phoneNumber: string, password: string }): Observable<LoginResponse> {
     return this.http.get<User[]>(`${this.apiUrl}/users`).pipe(
-      map(users => {
+      switchMap(users => {
         // Check if email already exists
         const existingUser = users.find(u => u.email === registrationData.email);
         
@@ -153,13 +153,10 @@ export class AuthService {
           password: registrationData.password // In production, this should be hashed
         };
 
-        return newUser;
-      }),
-      // Use switchMap to handle the nested observable properly
-      map(newUser => {
         // Save the new user to the JSON file using POST request
-        this.http.post<User>(`${this.apiUrl}/users`, newUser).subscribe();
-
+        return this.http.post<User>(`${this.apiUrl}/users`, newUser);
+      }),
+      map(newUser => {
         // Generate session ID for the new user
         const sessionId = uuidv4();
         

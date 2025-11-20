@@ -17,6 +17,8 @@ interface Booking {
   serviceName: string;
   partnerId: string;
   partnerName: string;
+  partnerRating?: number;
+  partnerReviews?: number;
   date: string;
   time: string;
   duration: string;
@@ -144,15 +146,32 @@ export class PaymentComponent implements OnInit {
         return;
       }
 
+      // Fetch service details to get partner information
+      const serviceData: any = await this.http.get(`/api/services/${this.bookingData.serviceId}`).toPromise();
+      
+      // Get partner details
+      const partnerData: any = await this.http.get(`/api/users/${serviceData.partnerId}`).toPromise();
+
+      // Calculate average rating
+      const ratings = serviceData.ratings || [];
+      const averageRating = ratings.length > 0 
+        ? Math.round((ratings.reduce((acc: number, r: any) => acc + r.rating, 0) / ratings.length) * 10) / 10 
+        : 0;
+
+      // Get partner name with fallback options
+      const partnerName = partnerData?.userName || partnerData?.name || 'Service Provider';
+
       // Create booking object
       const bookingId = 'BK' + Date.now();
-      const booking: Booking = {
+      const booking: any = {
         id: bookingId,
-        userId: currentUser.userId,
+        userId: currentUser.id,
         serviceId: this.bookingData.serviceId,
         serviceName: this.bookingData.serviceName,
-        partnerId: '001', // In real app, get from service data
-        partnerName: 'CleanPro Services', // In real app, get from service data
+        partnerId: serviceData.partnerId,
+        partnerName: partnerName,
+        partnerRating: averageRating,
+        partnerReviews: ratings.length,
         date: this.bookingData.selectedDate!.toISOString().split('T')[0],
         time: this.bookingData.selectedTime!,
         duration: this.bookingData.serviceDuration,
@@ -214,7 +233,7 @@ export class PaymentComponent implements OnInit {
 
     const partnerNotification = {
       id: 'NOT' + (Date.now() + 1),
-      partnerId: booking.partnerId,
+      userId: booking.partnerId,
       type: 'booking',
       title: 'New Booking Received',
       message: `New booking for ${booking.serviceName} on ${booking.date}`,
@@ -234,6 +253,12 @@ export class PaymentComponent implements OnInit {
     } catch (error) {
       console.error('Error creating notifications:', error);
     }
+  }
+
+  calculateAverageRating(ratings: any[]): number {
+    if (!ratings || ratings.length === 0) return 0;
+    const sum = ratings.reduce((acc: number, r: any) => acc + r.rating, 0);
+    return Math.round((sum / ratings.length) * 10) / 10;
   }
 
   navigateBack(): void {

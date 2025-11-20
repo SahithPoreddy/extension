@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewContainerRef, ComponentRef } from '@angular/core';
+import { Component, OnInit, ViewContainerRef, ComponentRef, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -26,122 +26,6 @@ interface QuickAction {
   route: string;
 }
 
-@Component({
-  selector: 'app-user-profile',
-  imports: [
-    CommonModule,
-    ReactiveFormsModule,
-    MatIconModule,
-    MatButtonModule,
-    MatBadgeModule,
-    AddAddressDialogComponent
-  ],
-  templateUrl: './user-profile.component.html',
-  styleUrl: './user-profile.component.css'
-})
-export class UserProfileComponent implements OnInit {
-  userName = 'Priya Sharma';
-  userEmail = 'priya.sharma@example.com';
-  userPhone = '+91 98765 43210';
-  isVerified = true;
-  isPremiumMember = true;
-  
-  bookingsCount = 24;
-  avgRating = 4.8;
-  rewardsBalance = 250;
-
-  savedAddresses: Address[] = [
-    {
-      id: '1',
-      type: 'Home',
-      addressLine1: '123 Main St, Apartment 4B',
-      addressLine2: 'Mumbai, Maharashtra 400001',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400001',
-      isDefault: true
-    },
-    {
-      id: '2',
-      type: 'Office',
-      addressLine1: '456 Business Park, Tower A, 5th Floor',
-      addressLine2: 'Mumbai, Maharashtra 400002',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pincode: '400002'
-    }
-  ];
-
-  quickActions: QuickAction[] = [
-    {
-      icon: 'credit_card',
-      title: 'Payment Methods',
-      description: 'Manage cards and wallets',
-      route: '/user/payment-methods'
-    },
-    {
-      icon: 'calendar_today',
-      title: 'My Bookings',
-      description: 'View all service bookings',
-      route: '/user/bookings'
-    },
-    {
-      icon: 'help_outline',
-      title: 'Help & Support',
-      description: 'Get help with your services',
-      route: '/user/support'
-    }
-  ];
-
-  showAddAddressDialog = false;
-
-  constructor(
-    private router: Router,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    const user = this.authService.getCurrentUser();
-    if (user) {
-      this.userName = user.userName;
-      this.userEmail = user.email;
-    }
-  }
-
-  navigateToDashboard(): void {
-    this.router.navigate(['/user/dashboard']);
-  }
-
-  navigateTo(route: string): void {
-    this.router.navigate([route]);
-  }
-
-  editProfile(): void {
-    // Navigate to edit profile page (to be implemented)
-    console.log('Edit profile clicked');
-  }
-
-  openAddAddressDialog(): void {
-    this.showAddAddressDialog = true;
-  }
-
-  closeAddAddressDialog(): void {
-    this.showAddAddressDialog = false;
-  }
-
-  onAddressSaved(address: Address): void {
-    this.savedAddresses.push(address);
-    this.closeAddAddressDialog();
-  }
-
-  logout(): void {
-    this.authService.logout();
-    this.router.navigate(['/user/login']);
-  }
-}
-
-// Add Address Dialog Component - Exported for use in template
-export { AddAddressDialogComponent };
 
 @Component({
   selector: 'app-add-address-dialog',
@@ -432,7 +316,10 @@ export { AddAddressDialogComponent };
     }
   `]
 })
+
 class AddAddressDialogComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+  @Output() addressSaved = new EventEmitter<Address>();
   addressForm!: FormGroup;
 
   constructor(
@@ -482,14 +369,399 @@ class AddAddressDialogComponent implements OnInit {
         pincode: this.addressForm.value.pincode
       };
 
-      // In a real app, save to backend and update parent
-      // For now, just close the dialog
-      this.onCancel();
+      this.addressSaved.emit(newAddress);
+      this.close.emit();
     }
   }
 
   onCancel(): void {
-    // This will be handled by parent component
-    // Emit event or use service to close
+    this.close.emit();
   }
 }
+
+// Edit Profile Dialog Component
+@Component({
+  selector: 'app-edit-profile-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule
+  ],
+  template: `
+    <div class="dialog-overlay" (click)="onCancel()">
+      <div class="dialog-container" (click)="$event.stopPropagation()">
+        <div class="dialog-header">
+          <h2>Edit Profile</h2>
+          <button class="close-button" (click)="onCancel()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </div>
+
+        <form [formGroup]="profileForm" (ngSubmit)="onSubmit()">
+          <div class="form-field">
+            <label>Full Name <span class="required">*</span></label>
+            <input
+              type="text"
+              formControlName="userName"
+              placeholder="Enter your full name"
+            />
+            @if (getErrorMessage('userName')) {
+              <div class="error-message">{{ getErrorMessage('userName') }}</div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label>Email Address <span class="required">*</span></label>
+            <input
+              type="email"
+              formControlName="email"
+              placeholder="Enter your email"
+            />
+            @if (getErrorMessage('email')) {
+              <div class="error-message">{{ getErrorMessage('email') }}</div>
+            }
+          </div>
+
+          <div class="form-field">
+            <label>Phone Number <span class="required">*</span></label>
+            <input
+              type="tel"
+              formControlName="phone"
+              placeholder="Enter your phone number"
+              maxlength="10"
+            />
+            @if (getErrorMessage('phone')) {
+              <div class="error-message">{{ getErrorMessage('phone') }}</div>
+            }
+          </div>
+
+          <div class="form-actions">
+            <button type="button" class="btn-cancel" (click)="onCancel()">
+              Cancel
+            </button>
+            <button type="submit" class="btn-save" [disabled]="!profileForm.valid">
+              Save Changes
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .dialog-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .dialog-container {
+      background: white;
+      border-radius: 12px;
+      width: 90%;
+      max-width: 500px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+
+    .dialog-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .dialog-header h2 {
+      font-size: 20px;
+      font-weight: 700;
+      color: #333;
+      margin: 0;
+    }
+
+    .close-button {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #f5f5f5;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: background 0.3s;
+    }
+
+    .close-button:hover {
+      background: #e0e0e0;
+    }
+
+    form {
+      padding: 24px;
+    }
+
+    .form-field {
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      font-size: 14px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 8px;
+    }
+
+    .required {
+      color: #dc2626;
+    }
+
+    input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid #ddd;
+      border-radius: 8px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #1a237e;
+    }
+
+    .error-message {
+      color: #dc2626;
+      font-size: 12px;
+      margin-top: 4px;
+    }
+
+    .form-actions {
+      display: flex;
+      gap: 12px;
+      margin-top: 24px;
+    }
+
+    .btn-cancel,
+    .btn-save {
+      flex: 1;
+      padding: 12px;
+      border-radius: 8px;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .btn-cancel {
+      background: white;
+      border: 1px solid #ddd;
+      color: #666;
+    }
+
+    .btn-cancel:hover {
+      background: #f5f5f5;
+    }
+
+    .btn-save {
+      background: #1a237e;
+      border: none;
+      color: white;
+    }
+
+    .btn-save:hover:not(:disabled) {
+      background: #0d1650;
+    }
+
+    .btn-save:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  `]
+})
+class EditProfileDialogComponent implements OnInit {
+  @Output() close = new EventEmitter<void>();
+  profileForm!: FormGroup;
+  initialData: any;
+
+  constructor(
+    private fb: FormBuilder
+  ) {}
+
+  ngOnInit(): void {
+    this.profileForm = this.fb.group({
+      userName: [this.initialData?.userName || '', [Validators.required, Validators.minLength(3)]],
+      email: [this.initialData?.email || '', [Validators.required, Validators.email]],
+      phone: [this.initialData?.phone || '', [Validators.required, Validators.pattern(/^\d{10}$/)]]
+    });
+  }
+
+  getErrorMessage(fieldName: string): string {
+    const control = this.profileForm.get(fieldName);
+    
+    if (!control || !control.errors || !control.touched) {
+      return '';
+    }
+
+    if (control.hasError('required')) {
+      return 'This field is required';
+    }
+
+    if (fieldName === 'userName' && control.hasError('minlength')) {
+      return 'Name must be at least 3 characters';
+    }
+
+    if (fieldName === 'email' && control.hasError('email')) {
+      return 'Please enter a valid email address';
+    }
+
+    if (fieldName === 'phone' && control.hasError('pattern')) {
+      return 'Please enter a valid 10-digit phone number';
+    }
+
+    return '';
+  }
+
+  onSubmit(): void {
+    if (this.profileForm.valid) {
+      // Emit the updated profile data
+      // This will be handled by parent component
+      this.close.emit();
+    }
+  }
+
+  onCancel(): void {
+    this.close.emit();
+  }
+}
+
+@Component({
+  selector: 'app-user-profile',
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatIconModule,
+    MatButtonModule,
+    MatBadgeModule,
+    AddAddressDialogComponent,
+    EditProfileDialogComponent
+  ],
+  templateUrl: './user-profile.component.html',
+  styleUrl: './user-profile.component.css'
+})
+export class UserProfileComponent implements OnInit {
+  userName = 'Priya Sharma';
+  userEmail = 'priya.sharma@example.com';
+  userPhone = '+91 98765 43210';
+  isVerified = true;
+  isPremiumMember = true;
+  
+  bookingsCount = 24;
+  avgRating = 4.8;
+  rewardsBalance = 250;
+
+  savedAddresses: Address[] = [];
+
+  quickActions: QuickAction[] = [
+    {
+      icon: 'credit_card',
+      title: 'Payment Methods',
+      description: 'Manage cards and wallets',
+      route: '/user/payment-methods'
+    },
+    {
+      icon: 'calendar_today',
+      title: 'My Bookings',
+      description: 'View all service bookings',
+      route: '/user/bookings'
+    },
+    {
+      icon: 'help_outline',
+      title: 'Help & Support',
+      description: 'Get help with your services',
+      route: '/user/support'
+    }
+  ];
+
+  showAddAddressDialog = false;
+  showEditProfileDialog = false;
+
+  constructor(
+    private router: Router,
+    private authService: AuthService
+  ) {}
+
+  ngOnInit(): void {
+    const user = this.authService.getCurrentUser();
+    if (user) {
+      this.userName = user.userName;
+      this.userEmail = user.email;
+      // Load user addresses if they exist
+      const userData = user as any;
+      if (userData.addresses && Array.isArray(userData.addresses)) {
+        this.savedAddresses = userData.addresses.map((addr: any, index: number) => ({
+          id: (index + 1).toString(),
+          type: addr.tag || addr.type || 'Home',
+          addressLine1: addr.street || addr.addressLine1 || '',
+          addressLine2: `${addr.city}, ${addr.state} ${addr.pincode}`,
+          city: addr.city,
+          state: addr.state,
+          pincode: addr.pincode.toString(),
+          isDefault: index === 0
+        }));
+      }
+    }
+  }
+
+  navigateToDashboard(): void {
+    this.router.navigate(['/user/dashboard']);
+  }
+
+  navigateTo(route: string): void {
+    this.router.navigate([route]);
+  }
+
+  editProfile(): void {
+    this.showEditProfileDialog = true;
+  }
+
+  closeEditProfileDialog(): void {
+    this.showEditProfileDialog = false;
+  }
+
+  onProfileUpdated(profileData: any): void {
+    this.userName = profileData.userName;
+    this.userEmail = profileData.email;
+    this.closeEditProfileDialog();
+  }
+
+  openAddAddressDialog(): void {
+    this.showAddAddressDialog = true;
+  }
+
+  closeAddAddressDialog(): void {
+    this.showAddAddressDialog = false;
+  }
+
+  onAddressSaved(address: Address): void {
+    this.savedAddresses.push(address);
+    this.closeAddAddressDialog();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/user/login']);
+  }
+}
+
+// Dialog Components - Exported for use in template
+export { AddAddressDialogComponent, EditProfileDialogComponent };

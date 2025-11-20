@@ -108,7 +108,7 @@ export class PartnerRegistrationComponent implements OnInit {
   }
 
   get progressPercentage(): number {
-    return ((this.currentStep + 1) / this.totalSteps) * 100;
+    return Math.round((this.currentStep / this.totalSteps) * 100);
   }
 
   get isStep1Valid(): boolean {

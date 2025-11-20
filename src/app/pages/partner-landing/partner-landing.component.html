@@ -34,39 +34,57 @@
       <div class="hero-buttons">
         <button
           mat-raised-button
-          color="primary"
           class="become-partner-btn"
           (click)="navigateToRegister()"
         >
           Become a Partner
         </button>
-        <button mat-stroked-button class="learn-more-btn">Learn More</button>
+        <button mat-button class="learn-more-btn">Learn More</button>
       </div>
     </div>
 
-    <div class="hero-carousel">
-      <div class="carousel-container">
+    <div class="hero-image-section">
+      <div class="hero-image-container">
+        <!-- Carousel Images -->
         @for (image of carouselImages; track $index) {
         <img
           [src]="image"
-          [alt]="'Carousel image ' + ($index + 1)"
-          class="carousel-image"
+          [alt]="'Professional partner ' + ($index + 1)"
+          class="hero-main-image"
           [class.active]="currentImageIndex === $index"
         />
         }
 
         <!-- Floating Statistics -->
-        @for (stat of statistics; track stat.label) {
-        <div
-          class="floating-stat"
-          [style.top]="stat.position.top"
-          [style.left]="stat.position.left"
-          [style.right]="stat.position.right"
-        >
-          <div class="stat-value">{{ stat.value }}</div>
-          <div class="stat-label">{{ stat.label }}</div>
+        <div class="floating-stat stat-1">
+          <div class="stat-icon">
+            <mat-icon>trending_up</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">50K+</div>
+            <div class="stat-label">Active Partners</div>
+          </div>
         </div>
-        }
+
+        <div class="floating-stat stat-2">
+          <div class="stat-icon">
+            <mat-icon>verified</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">100%</div>
+            <div class="stat-label">Verified Partners</div>
+          </div>
+        </div>
+
+        <div class="floating-stat stat-3">
+          <div class="stat-icon">
+            <mat-icon>thumb_up</mat-icon>
+          </div>
+          <div class="stat-content">
+            <div class="stat-value">40%</div>
+            <div class="stat-label">More Earn per Year</div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -100,19 +118,80 @@
   </div>
 </section>
 
-<!-- Why Partner With Us Section -->
+<!-- Features Section -->
 <section class="features-section">
   <h2 class="section-title">Why Partner With Us?</h2>
   <div class="features-container">
-    @for (feature of features; track feature.title) {
-    <mat-card class="feature-card">
-      <mat-card-content>
-        <mat-icon class="feature-icon">{{ feature.icon }}</mat-icon>
-        <h3 class="feature-title">{{ feature.title }}</h3>
-        <p class="feature-description">{{ feature.description }}</p>
-      </mat-card-content>
-    </mat-card>
-    }
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">account_balance_wallet</mat-icon>
+      </div>
+      <h3 class="feature-title">Flexible Earnings</h3>
+      <p class="feature-description">
+        Set your own rates and service fees. Receive<br />
+        weekly payouts directly to your bank<br />
+        account.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">groups</mat-icon>
+      </div>
+      <h3 class="feature-title">Ready Customer Base</h3>
+      <p class="feature-description">
+        Access millions of customers actively<br />
+        looking for services like yours.<br />
+        No cold calling needed.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">verified_user</mat-icon>
+      </div>
+      <h3 class="feature-title">Insurance Coverage</h3>
+      <p class="feature-description">
+        All coverage is covered by our third-party<br />
+        protection plans for your peace of<br />
+        mind.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">schedule</mat-icon>
+      </div>
+      <h3 class="feature-title">Manage Your Schedule</h3>
+      <p class="feature-description">
+        Book our clients when it works for you and<br />
+        set-up flexibility using the work-life app.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">trending_up</mat-icon>
+      </div>
+      <h3 class="feature-title">Grow Your Business</h3>
+      <p class="feature-description">
+        Build your business with customer<br />
+        reviews and ratings to attract more<br />
+        bookings.
+      </p>
+    </div>
+
+    <div class="feature-card">
+      <div class="feature-icon-wrapper">
+        <mat-icon class="feature-icon">support_agent</mat-icon>
+      </div>
+      <h3 class="feature-title">Dedicated Support</h3>
+      <p class="feature-description">
+        We give customers to you through our<br />
+        marketing efforts and platform<br />
+        visibility.
+      </p>
+    </div>
   </div>
 </section>
 

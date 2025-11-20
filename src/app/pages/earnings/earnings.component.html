@@ -320,9 +320,9 @@
             <div class="bank-row">
               <div class="bank-field">
                 <span class="field-label">Account Number</span>
-                <span class="field-value"
-                  >****{{ bankDetails.accountNumber }}</span
-                >
+                <span class="field-value">{{
+                  getMaskedAccountNumber(bankDetails.accountNumber)
+                }}</span>
               </div>
             </div>
           </div>

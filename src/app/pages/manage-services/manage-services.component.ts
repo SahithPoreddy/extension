@@ -567,6 +567,7 @@ export class ServiceDialogComponent implements OnInit {
 
     this.http.get<any>(`/api/users/${this.data.partnerId}`).subscribe({
       next: (partner) => {
+        const category = this.serviceForm.value.category;
         const serviceData = {
           title: this.serviceForm.value.title,
           description: this.serviceForm.value.description,
@@ -583,14 +584,50 @@ export class ServiceDialogComponent implements OnInit {
           partner.services = {};
         }
 
-        const category = this.serviceForm.value.category;
-
         if (this.data.mode === 'add') {
+          // Add to partner's services
           if (!partner.services[category]) {
             partner.services[category] = [];
           }
           partner.services[category].push(serviceData);
+
+          // Also add to global services array
+          const globalService = {
+            id: Date.now().toString(),
+            partnerId: this.data.partnerId,
+            title: serviceData.title,
+            categoryId: category,
+            priceType: serviceData.pricingType,
+            price: serviceData.price,
+            duration: serviceData.duration,
+            hasOffer: serviceData.applyOffer,
+            offerTitle: serviceData.offerTitle,
+            offerDiscount: serviceData.discountPercentage,
+            active: true,
+            ratings: []
+          };
+
+          this.http.post('/api/services', globalService).subscribe({
+            next: () => {
+              // Update partner's services in their profile
+              this.http.patch(`/api/users/${this.data.partnerId}`, { services: partner.services }).subscribe({
+                next: () => {
+                  this.dialogRef.close(true);
+                }
+              });
+            },
+            error: (error) => {
+              console.error('Error saving to global services:', error);
+              // Still update partner's services even if global save fails
+              this.http.patch(`/api/users/${this.data.partnerId}`, { services: partner.services }).subscribe({
+                next: () => {
+                  this.dialogRef.close(true);
+                }
+              });
+            }
+          });
         } else {
+          // Edit mode
           const [oldCategory, indexStr] = this.data.service.id.split('-');
           const index = parseInt(indexStr);
 
@@ -606,13 +643,14 @@ export class ServiceDialogComponent implements OnInit {
             }
             partner.services[category].push(serviceData);
           }
-        }
 
-        this.http.patch(`/api/users/${this.data.partnerId}`, { services: partner.services }).subscribe({
-          next: () => {
-            this.dialogRef.close(true);
-          }
-        });
+          // Update partner's services
+          this.http.patch(`/api/users/${this.data.partnerId}`, { services: partner.services }).subscribe({
+            next: () => {
+              this.dialogRef.close(true);
+            }
+          });
+        }
       }
     });
   }

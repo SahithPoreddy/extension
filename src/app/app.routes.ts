@@ -23,31 +23,68 @@ import { BookingAddressComponent } from './pages/booking-address/booking-address
 import { BookingSummaryComponent } from './pages/booking-summary/booking-summary.component';
 import { PaymentComponent } from './pages/payment/payment.component';
 import { BookingConfirmationComponent } from './pages/booking-confirmation/booking-confirmation.component';
+import { UserBookingsComponent } from './pages/user-bookings/user-bookings.component';
+import { BookingDetailsComponent } from './pages/booking-details/booking-details.component';
+import { UserNotificationsComponent } from './pages/user-notifications/user-notifications.component';
+import { UserSupportComponent } from './pages/user-support/user-support.component';
+import { partnerGuard } from './guards/partner.guard';
+import { userGuard } from './guards/user.guard';
+import { authGuard } from './guards/auth.guard';
 
 export const routes: Routes = [
   { path: '', redirectTo: '/partner', pathMatch: 'full' },
+  
+  // Partner routes
   { path: 'partner', component: PartnerLandingComponent },
-  { path: 'customer', component: CustomerLandingComponent },
   { path: 'partner/login', component: PartnerLoginComponent },
   { path: 'partner/register', component: PartnerRegistrationComponent },
-  { path: 'partner/dashboard', component: PartnerDashboardComponent },
-  { path: 'partner/profile', component: PartnerProfileComponent },
-  { path: 'partner/services', component: ManageServicesComponent },
-  { path: 'partner/portfolio', component: PortfolioComponent },
-  { path: 'partner/bookings', component: MyBookingsComponent },
-  { path: 'partner/earnings', component: EarningsComponent },
-  { path: 'partner/reviews', component: ReviewsComponent },
-  { path: 'partner/notifications', component: NotificationsComponent },
-  { path: 'partner/support', component: SupportComponent },
+  {
+    path: 'partner',
+    canActivate: [partnerGuard],
+    children: [
+      { path: 'dashboard', component: PartnerDashboardComponent },
+      { path: 'profile', component: PartnerProfileComponent },
+      { path: 'services', component: ManageServicesComponent },
+      { path: 'portfolio', component: PortfolioComponent },
+      { path: 'bookings', component: MyBookingsComponent },
+      { path: 'earnings', component: EarningsComponent },
+      { path: 'reviews', component: ReviewsComponent },
+      { path: 'notifications', component: NotificationsComponent },
+      { path: 'support', component: SupportComponent }
+    ]
+  },
+
+  // Customer landing
+  { path: 'customer', component: CustomerLandingComponent },
+
+  // User routes
   { path: 'user/register', component: UserRegistrationComponent },
   { path: 'user/login', component: UserLoginComponent },
-  { path: 'user/dashboard', component: UserDashboardComponent },
-  { path: 'user/services', component: UserServicesComponent },
-  { path: 'user/service/:id', component: UserServiceDetailsComponent },
-  { path: 'user/profile', component: UserProfileComponent },
-  { path: 'booking/schedule', component: BookingScheduleComponent },
-  { path: 'booking/address', component: BookingAddressComponent },
-  { path: 'booking/summary', component: BookingSummaryComponent },
-  { path: 'booking/payment', component: PaymentComponent },
-  { path: 'booking/confirmation/:id', component: BookingConfirmationComponent },
+  {
+    path: 'user',
+    canActivate: [userGuard],
+    children: [
+      { path: 'dashboard', component: UserDashboardComponent },
+      { path: 'services', component: UserServicesComponent },
+      { path: 'service/:id', component: UserServiceDetailsComponent },
+      { path: 'profile', component: UserProfileComponent },
+      { path: 'bookings', component: UserBookingsComponent },
+      { path: 'booking/:id', component: BookingDetailsComponent },
+      { path: 'notifications', component: UserNotificationsComponent },
+      { path: 'support', component: UserSupportComponent }
+    ]
+  },
+
+  // Booking flow routes (protected by user guard)
+  {
+    path: 'booking',
+    canActivate: [userGuard],
+    children: [
+      { path: 'schedule', component: BookingScheduleComponent },
+      { path: 'address', component: BookingAddressComponent },
+      { path: 'summary', component: BookingSummaryComponent },
+      { path: 'payment', component: PaymentComponent },
+      { path: 'confirmation/:id', component: BookingConfirmationComponent }
+    ]
+  }
 ];

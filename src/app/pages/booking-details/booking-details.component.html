@@ -1,0 +1,145 @@
+<div class="booking-details-container">
+  @if (loading) {
+  <div class="loading-state">
+    <p>Loading booking details...</p>
+  </div>
+  } @else if (error || !booking) {
+  <div class="error-state">
+    <mat-icon>error_outline</mat-icon>
+    <h2>Booking Not Found</h2>
+    <p>We couldn't find the booking you're looking for.</p>
+    <button mat-raised-button color="primary" (click)="navigateToHome()">
+      Go to Dashboard
+    </button>
+  </div>
+  } @else {
+  <div class="booking-details-header">
+    <button mat-icon-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Booking Details</h1>
+  </div>
+
+  <div class="booking-details-content">
+    <div class="header-row">
+      <div class="booking-id-section">
+        <p class="booking-id-label">
+          Booking ID: <span class="booking-id-value">{{ booking.id }}</span>
+        </p>
+      </div>
+      <span class="status-badge" [ngClass]="getStatusClass()">
+        {{ booking.status }}
+      </span>
+    </div>
+
+    <div class="info-section">
+      <h3 class="section-title">Service Information</h3>
+      <div class="info-card">
+        <div class="info-row">
+          <span class="info-label">Service</span>
+          <span class="info-value">{{ booking.serviceName }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Date & Time</span>
+          <span class="info-value"
+            >{{ getFormattedDate() }} at {{ booking.time }}</span
+          >
+        </div>
+        <div class="info-row">
+          <span class="info-label">Duration</span>
+          <span class="info-value">{{ booking.duration }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Amount Paid</span>
+          <span class="info-value amount">₹{{ booking.amount }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3 class="section-title">Service Address</h3>
+      <div class="info-card">
+        <div class="address-row">
+          <mat-icon class="address-icon">{{ getAddressIcon() }}</mat-icon>
+          <div class="address-content">
+            <p class="address-type">{{ booking.address.type }}</p>
+            <p class="address-text">{{ getShortAddress() }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="info-section">
+      <h3 class="section-title">Service Provider</h3>
+      <div class="info-card provider-card">
+        <div class="provider-info">
+          <div class="provider-avatar">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="provider-details">
+            <h4>{{ booking.partnerName }}</h4>
+            @if (booking.partnerRating) {
+            <div class="provider-rating">
+              <mat-icon class="star-icon">star</mat-icon>
+              <span
+                >{{ booking.partnerRating }} ({{
+                  booking.partnerReviews || 234
+                }}
+                reviews)</span
+              >
+            </div>
+            }
+          </div>
+        </div>
+        <div class="provider-actions">
+          <button mat-stroked-button (click)="openChatWithProvider()">
+            <mat-icon>chat</mat-icon>
+            Chat
+          </button>
+          <button mat-stroked-button (click)="callProvider()">
+            <mat-icon>phone</mat-icon>
+            Call
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="action-buttons-section">
+      @if (showRescheduleButton() && showCancelButton()) {
+      <button
+        mat-stroked-button
+        class="action-btn secondary"
+        (click)="rescheduleBooking()"
+      >
+        Reschedule
+      </button>
+      <button
+        mat-stroked-button
+        class="action-btn cancel"
+        (click)="cancelBooking()"
+      >
+        Cancel Booking
+      </button>
+      } @else if (showCancelButton() && !showRescheduleButton()) {
+      <button
+        mat-stroked-button
+        class="action-btn cancel full-width"
+        (click)="cancelBooking()"
+      >
+        Cancel Booking
+      </button>
+      } @else if (showLeaveReviewButton()) {
+      <button
+        mat-raised-button
+        color="primary"
+        class="action-btn review full-width"
+        (click)="leaveReview()"
+      >
+        <mat-icon>star</mat-icon>
+        Leave a Review
+      </button>
+      }
+    </div>
+  </div>
+  }
+</div>

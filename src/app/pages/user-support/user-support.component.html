@@ -1,0 +1,85 @@
+<div class="support-container">
+  <div class="support-header">
+    <button mat-icon-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <span class="back-text">Back to Results</span>
+  </div>
+
+  <div class="support-content">
+    <h1 class="page-title">Help & Support</h1>
+
+    <!-- Contact Us Section -->
+    <section class="contact-section">
+      <h2 class="section-title">Contact Us</h2>
+      <div class="contact-methods">
+        @for (method of contactMethods; track method.title) {
+        <div class="contact-card">
+          <div class="contact-icon" [style.color]="method.iconColor">
+            <mat-icon>{{ method.icon }}</mat-icon>
+          </div>
+          <h3>{{ method.title }}</h3>
+          <p>{{ method.subtitle }}</p>
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- FAQs Section -->
+    <section class="faq-section">
+      <h2 class="section-title">Frequently Asked Questions</h2>
+      <div class="faq-list">
+        @for (faq of faqs; track faq.question) {
+        <div class="faq-item" [class.expanded]="faq.isExpanded">
+          <div class="faq-question" (click)="toggleFAQ(faq)">
+            <h3>{{ faq.question }}</h3>
+            <mat-icon class="expand-icon">{{
+              faq.isExpanded ? "expand_less" : "expand_more"
+            }}</mat-icon>
+          </div>
+          @if (faq.isExpanded) {
+          <div class="faq-answer">
+            <p>{{ faq.answer }}</p>
+          </div>
+          }
+        </div>
+        }
+      </div>
+    </section>
+
+    <!-- Send Message Section -->
+    <section class="message-section">
+      <h2 class="section-title">Send us a Message</h2>
+      <div class="message-form">
+        <div class="form-group">
+          <label for="subject">Subject</label>
+          <input
+            type="text"
+            id="subject"
+            [(ngModel)]="messageSubject"
+            placeholder="What do you need help with?"
+            class="form-input"
+          />
+        </div>
+        <div class="form-group">
+          <label for="message">Message</label>
+          <textarea
+            id="message"
+            [(ngModel)]="messageText"
+            placeholder="Describe your issue in detail..."
+            rows="5"
+            class="form-textarea"
+          ></textarea>
+        </div>
+        <button
+          mat-raised-button
+          class="send-button"
+          [disabled]="!canSendMessage()"
+          (click)="sendMessage()"
+        >
+          Send Message
+        </button>
+      </div>
+    </section>
+  </div>
+</div>

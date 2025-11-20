@@ -77,6 +77,7 @@ export class PartnerDashboardComponent implements OnInit {
       label: 'Portfolio', 
       completed: false, 
       icon: 'photo_library',
+      route: '/partner/portfolio',
       action: 'Add Photos'
     }
   ];
@@ -135,7 +136,6 @@ export class PartnerDashboardComponent implements OnInit {
   loadPartnerData(): void {
     const user = this.authService.getCurrentUser();
     if (user) {
-      this.partnerName = user.userName;
       this.loadPartnerStatistics(user.id);
     } else {
       this.router.navigate(['/partner/login']);
@@ -146,6 +146,9 @@ export class PartnerDashboardComponent implements OnInit {
     // Fetch partner data from API
     this.http.get<any>(`/api/users/${userId}`).subscribe({
       next: (partner) => {
+        // Always update partner name from API to ensure it's set correctly
+        this.partnerName = partner.userName || partner.name || 'Partner';
+        
         // Update statistics based on partner data
         if (partner.services) {
           const servicesCount = Object.values(partner.services).reduce(
@@ -158,6 +161,9 @@ export class PartnerDashboardComponent implements OnInit {
         // Update profile sections based on actual data
         this.profileSections[1].completed = partner.services && 
           Object.keys(partner.services).length > 0;
+        
+        // Check portfolio completion from the same partner data
+        this.profileSections[2].completed = partner.portfolio && partner.portfolio.length > 0;
         
         this.calculateProfileCompletion();
       },

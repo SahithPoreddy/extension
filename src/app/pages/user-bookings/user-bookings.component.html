@@ -1,0 +1,83 @@
+<div class="bookings-container">
+  <div class="bookings-header">
+    <button mat-icon-button class="back-button" (click)="navigateBack()">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>My Bookings</h1>
+  </div>
+
+  <div class="filter-tabs">
+    @for (filter of statusFilters; track filter.label) {
+    <button
+      class="filter-tab"
+      [class.active]="selectedStatus === filter.label"
+      (click)="selectStatus(filter.label)"
+    >
+      {{ filter.label }} ({{ filter.count }})
+    </button>
+    }
+  </div>
+
+  <div class="bookings-list">
+    @if (displayedBookings.length === 0) {
+    <div class="no-bookings">
+      <mat-icon>event_busy</mat-icon>
+      <h3>No bookings found</h3>
+      <p>
+        You don't have any
+        {{
+          selectedStatus === "All" ? "" : selectedStatus.toLowerCase()
+        }}
+        bookings yet.
+      </p>
+      <button mat-raised-button color="primary" (click)="navigateToHome()">
+        Browse Services
+      </button>
+    </div>
+    } @else { @for (booking of displayedBookings; track booking.id) {
+    <div class="booking-card">
+      <div class="booking-card-header">
+        <h3>{{ booking.serviceName }}</h3>
+        <span class="status-badge" [ngClass]="getStatusClass(booking.status)">
+          {{ booking.status }}
+        </span>
+      </div>
+
+      <div class="booking-info">
+        <div class="info-row">
+          <mat-icon class="info-icon">calendar_today</mat-icon>
+          <span
+            >{{ getFormattedDate(booking.date) }} at {{ booking.time }}</span
+          >
+        </div>
+
+        <div class="info-row">
+          <mat-icon class="info-icon">person</mat-icon>
+          <span>Provider: {{ booking.providerName }}</span>
+        </div>
+
+        <div class="info-row">
+          <mat-icon class="info-icon">schedule</mat-icon>
+          <span>Duration: {{ booking.duration }}</span>
+        </div>
+
+        <div class="info-row">
+          <mat-icon class="info-icon">payments</mat-icon>
+          <span class="amount">₹{{ booking.amount }}</span>
+        </div>
+      </div>
+
+      <div class="booking-actions">
+        <button
+          mat-stroked-button
+          color="primary"
+          (click)="viewDetails(booking.id)"
+        >
+          View Details
+          <mat-icon>chevron_right</mat-icon>
+        </button>
+      </div>
+    </div>
+    } }
+  </div>
+</div>

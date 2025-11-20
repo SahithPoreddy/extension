@@ -11,6 +11,10 @@ import { MatSelectModule } from '@angular/material/select';
 import { MatTabsModule } from '@angular/material/tabs';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { Store } from '@ngrx/store';
+import { Observable } from 'rxjs';
+import * as BookingActions from '../../store/bookings/booking.actions';
+import * as BookingSelectors from '../../store/bookings/booking.selectors';
 
 interface MenuItem {
   name: string;
@@ -70,17 +74,27 @@ export class MyBookingsComponent implements OnInit {
     { name: 'Support', icon: 'help', route: 'support' }
   ];
 
+  bookings$: Observable<any[]>;
+  filteredBookings$: Observable<any[]>;
+  bookingCounts$: Observable<any>;
+  selectedFilter$: Observable<string>;
+  loading$: Observable<boolean>;
+
   constructor(
     private router: Router,
     private http: HttpClient,
-    private authService: AuthService
-  ) {}
-
-  ngOnInit(): void {
-    this.loadBookings();
+    private authService: AuthService,
+    private store: Store
+  ) {
+    // Initialize observables from store
+    this.bookings$ = this.store.select(BookingSelectors.selectAllBookings);
+    this.filteredBookings$ = this.store.select(BookingSelectors.selectFilteredBookings);
+    this.bookingCounts$ = this.store.select(BookingSelectors.selectBookingCounts);
+    this.selectedFilter$ = this.store.select(BookingSelectors.selectSelectedFilter);
+    this.loading$ = this.store.select(BookingSelectors.selectBookingsLoading);
   }
 
-  loadBookings(): void {
+  ngOnInit(): void {
     const currentUser = this.authService.getCurrentUser();
     if (!currentUser) {
       this.router.navigate(['/partner/login']);
@@ -90,15 +104,24 @@ export class MyBookingsComponent implements OnInit {
     this.partnerId = currentUser.id;
     this.partnerName = currentUser.userName;
 
-    // Load bookings from API
-    this.http.get<any[]>('/api/bookings').subscribe({
-      next: (bookings) => {
-        this.allBookings = bookings.filter(b => b.partnerId === this.partnerId);
-        this.applyFilters();
-      },
-      error: (err) => {
-        console.error('Error loading bookings:', err);
-      }
+    // Dispatch action to load bookings
+    this.store.dispatch(BookingActions.loadBookings());
+
+    // Subscribe to bookings for local processing
+    this.filteredBookings$.subscribe(bookings => {
+      this.filteredBookings = bookings.map(b => ({
+        id: b.id,
+        customerName: b.userId,
+        serviceName: b.serviceName,
+        serviceType: b.duration || '',
+        bookingDate: b.date,
+        bookingTime: b.time,
+        address: this.formatAddress(b.address),
+        phoneNumber: b.phoneNumber || 'N/A',
+        status: b.status,
+        price: b.amount,
+        specialInstructions: b.additionalInstructions
+      }));
     });
   }
 
@@ -119,30 +142,42 @@ export class MyBookingsComponent implements OnInit {
   }
 
   onTabChange(event: any): void {
-    const tabLabels = ['All', 'Pending', 'Upcoming', 'Completed', 'Canceled'];
-    this.selectedTab = tabLabels[event.index];
-    this.applyFilters();
+    const tabLabels: Array<'all' | 'Pending' | 'Confirmed' | 'Upcoming' | 'Completed' | 'Cancelled'> = 
+      ['all', 'Pending', 'Upcoming', 'Completed', 'Cancelled'];
+    const filter = tabLabels[event.index];
+    
+    // Dispatch action to update filter in store
+    this.store.dispatch(BookingActions.setFilter({ filter }));
+    this.selectedTab = filter === 'all' ? 'All' : filter;
   }
 
   applyFilters(): void {
-    let filtered = [...this.allBookings];
-
-    // Apply search filter
+    // Search filter is applied locally since NgRx handles status filtering
     if (this.searchQuery.trim()) {
       const query = this.searchQuery.toLowerCase();
-      filtered = filtered.filter(booking => 
+      this.filteredBookings = this.filteredBookings.filter(booking => 
         booking.customerName.toLowerCase().includes(query) ||
         booking.id.toLowerCase().includes(query) ||
         booking.serviceName.toLowerCase().includes(query)
       );
+    } else {
+      // Reset to store filtered bookings
+      this.filteredBookings$.subscribe(bookings => {
+        this.filteredBookings = bookings.map(b => ({
+          id: b.id,
+          customerName: b.userId,
+          serviceName: b.serviceName,
+          serviceType: b.duration || '',
+          bookingDate: b.date,
+          bookingTime: b.time,
+          address: this.formatAddress(b.address),
+          phoneNumber: b.phoneNumber || 'N/A',
+          status: b.status,
+          price: b.amount,
+          specialInstructions: b.additionalInstructions
+        }));
+      }).unsubscribe();
     }
-
-    // Apply tab filter
-    if (this.selectedTab !== 'All') {
-      filtered = filtered.filter(booking => this.matchesTabFilter(booking));
-    }
-
-    this.filteredBookings = filtered;
   }
 
   matchesTabFilter(booking: Booking): boolean {
@@ -265,6 +300,11 @@ export class MyBookingsComponent implements OnInit {
               next: () => {
                 this.allBookings[bookingIndex].status = newStatus as any;
                 this.applyFilters();
+                
+                // If status changed to Completed, create earning transaction
+                if (newStatus === 'Completed') {
+                  this.createEarningTransaction(bookings[apiBookingIndex]);
+                }
               }
             });
           }
@@ -273,8 +313,46 @@ export class MyBookingsComponent implements OnInit {
     }
   }
 
+  createEarningTransaction(booking: any): void {
+    const transaction = {
+      id: 'TXN' + Date.now(),
+      partnerId: this.partnerId,
+      type: 'earning',
+      title: booking.serviceName,
+      from: booking.userId,
+      amount: booking.amount,
+      date: new Date().toISOString(),
+      status: 'Completed'
+    };
+
+    this.http.post('/api/transactions', transaction).subscribe({
+      next: () => {
+        console.log('Earning transaction created');
+      },
+      error: (error) => {
+        console.error('Error creating earning transaction:', error);
+      }
+    });
+  }
+
+  formatAddress(address: any): string {
+    if (typeof address === 'string') return address;
+    if (!address) return 'N/A';
+    
+    const parts = [];
+    if (address.addressLine1) parts.push(address.addressLine1);
+    if (address.city) parts.push(address.city);
+    if (address.state) parts.push(address.state);
+    if (address.pincode) parts.push(address.pincode);
+    
+    return parts.join(', ') || 'N/A';
+  }
+
   formatDate(dateString: string): string {
+    if (!dateString) return 'N/A';
     const date = new Date(dateString);
+    if (isNaN(date.getTime())) return 'N/A';
+    
     const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const day = date.getDate();
     const month = months[date.getMonth()];
@@ -284,6 +362,7 @@ export class MyBookingsComponent implements OnInit {
   }
 
   formatTime(timeString: string): string {
+    if (!timeString) return 'N/A';
     return timeString;
   }
 }

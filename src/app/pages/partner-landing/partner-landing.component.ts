@@ -147,7 +147,7 @@ export class PartnerLandingComponent implements OnInit, OnDestroy {
   startCarousel(): void {
     this.carouselInterval = setInterval(() => {
       this.currentImageIndex = (this.currentImageIndex + 1) % this.carouselImages.length;
-    }, 1000);
+    }, 2000);
   }
 
   navigateToLogin(): void {

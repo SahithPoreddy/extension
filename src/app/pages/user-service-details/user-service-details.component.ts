@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
+import { HttpClient } from '@angular/common/http';
 import { BookingService } from '../../services/booking.service';
 
 interface Review {
@@ -137,7 +138,8 @@ export class UserServiceDetailsComponent implements OnInit {
   constructor(
     private router: Router,
     private route: ActivatedRoute,
-    private bookingService: BookingService
+    private bookingService: BookingService,
+    private http: HttpClient
   ) {}
 
   ngOnInit(): void {
@@ -148,8 +150,145 @@ export class UserServiceDetailsComponent implements OnInit {
   }
 
   loadServiceDetails(): void {
-    // In a real app, fetch from API
-    this.service = this.servicesData[this.serviceId] || null;
+    this.http.get<any>(`/api/services/${this.serviceId}`).subscribe({
+      next: (serviceData) => {
+        // Load reviews from userReviews endpoint
+        this.http.get<any[]>(`/api/userReviews?serviceId=${this.serviceId}`).subscribe({
+          next: (reviews) => {
+            // Map API data to ServiceDetail interface
+            const averageRating = this.calculateAverageRating(reviews);
+            
+            this.service = {
+              id: serviceData.id,
+              name: serviceData.title,
+              category: serviceData.categoryId,
+              image: serviceData.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800',
+              price: serviceData.price,
+              originalPrice: serviceData.hasOffer ? Math.round(serviceData.price / (1 - serviceData.offerDiscount / 100)) : undefined,
+              discount: serviceData.hasOffer ? serviceData.offerDiscount : undefined,
+              rating: averageRating,
+              reviewCount: reviews.length,
+              duration: this.formatDuration(serviceData.duration, serviceData.priceType),
+              description: 'Professional service that covers all your needs. Our trained professionals use quality products and advanced equipment to ensure a thorough experience. Perfect for regular maintenance or special occasions.',
+              whatsIncluded: [
+                'Complete service coverage',
+                'Professional equipment and materials',
+                'Quality assurance',
+                'Clean-up after service',
+                'Satisfaction guaranteed'
+              ],
+              features: [
+                {
+                  icon: 'verified_user',
+                  title: 'Verified & trained professionals',
+                  description: 'All service providers are background checked'
+                },
+                {
+                  icon: 'workspace_premium',
+                  title: 'Satisfaction guarantee',
+                  description: 'We ensure quality service or money back'
+                },
+                {
+                  icon: 'support_agent',
+                  title: 'On-site service',
+                  description: 'Service at your convenience'
+                },
+                {
+                  icon: 'groups',
+                  title: 'Professional team',
+                  description: 'Experienced service providers'
+                }
+              ],
+              partnerName: 'Professional Services',
+              reviews: this.mapReviews(reviews)
+            };
+          },
+          error: (error) => {
+            console.error('Error loading reviews:', error);
+            // Use service data without reviews if userReviews fetch fails
+            const averageRating = this.calculateAverageRating(serviceData.ratings || []);
+            
+            this.service = {
+              id: serviceData.id,
+              name: serviceData.title,
+              category: serviceData.categoryId,
+              image: serviceData.image || 'https://images.unsplash.com/photo-1581578731548-c64695cc6952?w=800',
+              price: serviceData.price,
+              originalPrice: serviceData.hasOffer ? Math.round(serviceData.price / (1 - serviceData.offerDiscount / 100)) : undefined,
+              discount: serviceData.hasOffer ? serviceData.offerDiscount : undefined,
+              rating: averageRating,
+              reviewCount: serviceData.ratings?.length || 0,
+              duration: this.formatDuration(serviceData.duration, serviceData.priceType),
+              description: 'Professional service that covers all your needs. Our trained professionals use quality products and advanced equipment to ensure a thorough experience. Perfect for regular maintenance or special occasions.',
+              whatsIncluded: [
+                'Complete service coverage',
+                'Professional equipment and materials',
+                'Quality assurance',
+                'Clean-up after service',
+                'Satisfaction guaranteed'
+              ],
+              features: [
+                {
+                  icon: 'verified_user',
+                  title: 'Verified & trained professionals',
+                  description: 'All service providers are background checked'
+                },
+                {
+                  icon: 'workspace_premium',
+                  title: 'Satisfaction guarantee',
+                  description: 'We ensure quality service or money back'
+                },
+                {
+                  icon: 'support_agent',
+                  title: 'On-site service',
+                  description: 'Service at your convenience'
+                },
+                {
+                  icon: 'groups',
+                  title: 'Professional team',
+                  description: 'Experienced service providers'
+                }
+              ],
+              partnerName: 'Professional Services',
+              reviews: this.mapReviews(serviceData.ratings || [])
+            };
+          }
+        });
+      },
+      error: (error) => {
+        console.error('Error loading service:', error);
+        // Fallback to hardcoded data if API fails
+        this.service = this.servicesData[this.serviceId] || null;
+      }
+    });
+  }
+
+  calculateAverageRating(ratings: any[]): number {
+    if (!ratings || ratings.length === 0) return 0;
+    const sum = ratings.reduce((acc, r) => acc + r.rating, 0);
+    return Math.round((sum / ratings.length) * 10) / 10;
+  }
+
+  formatDuration(duration: number, priceType: string): string {
+    if (priceType === 'daily') {
+      return duration === 1 ? '1 day' : `${duration} days`;
+    } else if (priceType === 'hourly') {
+      const hours = Math.floor(duration / 60);
+      return hours === 1 ? '1 hour' : `${hours} hours`;
+    }
+    return `${duration} mins`;
+  }
+
+  mapReviews(reviews: any[]): Review[] {
+    return reviews.slice(0, 5).map((review) => ({
+      id: review.id || review.bookingId,
+      userName: review.customerName || 'User',
+      userInitials: review.customerName ? review.customerName.charAt(0).toUpperCase() : 'U',
+      date: review.date ? new Date(review.date).toLocaleDateString() : 'Recently',
+      rating: review.rating,
+      comment: review.comment || '',
+      helpful: 0
+    }));
   }
 
   navigateBack(): void {
@@ -165,21 +304,13 @@ export class UserServiceDetailsComponent implements OnInit {
   }
 
   getRatingDistribution(star: number): number {
-    if (!this.service) return 0;
-    const total = this.service.reviewCount;
-    // Simulated distribution
-    const distributions: { [key: number]: number } = {
-      5: 925,
-      4: 189,
-      3: 75,
-      2: 32,
-      1: 13
-    };
-    return distributions[star] || 0;
+    if (!this.service || !this.service.reviews) return 0;
+    // Calculate actual distribution from reviews
+    return this.service.reviews.filter(review => review.rating === star).length;
   }
 
   getRatingPercentage(star: number): number {
-    if (!this.service) return 0;
+    if (!this.service || this.service.reviewCount === 0) return 0;
     const count = this.getRatingDistribution(star);
     return (count / this.service.reviewCount) * 100;
   }

@@ -167,5 +167,13 @@
 @if (showAddAddressDialog) {
 <app-add-address-dialog
   (close)="closeAddAddressDialog()"
+  (addressSaved)="onAddressSaved($event)"
 ></app-add-address-dialog>
+}
+
+<!-- Edit Profile Dialog -->
+@if (showEditProfileDialog) {
+<app-edit-profile-dialog
+  (close)="closeEditProfileDialog()"
+></app-edit-profile-dialog>
 }

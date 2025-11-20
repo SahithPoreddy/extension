@@ -82,11 +82,12 @@
             <span class="price-value">₹{{ priceDetails?.convenienceFee }}</span>
           </div>
 
-          @if (priceDetails?.discount && priceDetails.discount > 0) {
+          @if (priceDetails && priceDetails.discount && priceDetails.discount >
+          0) {
           <div class="price-row discount-row">
             <span class="price-label">Discount</span>
             <span class="price-value discount-value"
-              >-₹{{ priceDetails?.discount }}</span
+              >-₹{{ priceDetails.discount }}</span
             >
           </div>
           }
